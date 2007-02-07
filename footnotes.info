@@ -1,0 +1,4 @@
+; $Id$
+name = Footnotes
+description = "Create footnotes using <fn> tags."
+version = VERSION
