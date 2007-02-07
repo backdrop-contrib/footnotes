@@ -1,4 +1,4 @@
 ; $Id$
 name = Footnotes
-description = "Create footnotes using <fn> tags."
+description = "Easily add footnotes to your posts."
 version = VERSION
