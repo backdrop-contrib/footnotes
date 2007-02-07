@@ -1,0 +1,43 @@
+/*
+ * CSS specific to Footnotes module.
+*
+* Thanks to binford2k@lug.wsu.edu for this tip and drinkypoo
+* for the question leading up to it. http://drupal.org/node/80538
+*/
+ 
+
+/* Add empty space before footnotes and a black line on top. */
+div.footnotes {
+  margin-top: 4em;
+  border-top: 1px solid #000000;
+}
+
+/* Make footnotes appear in a smaller font */
+div.footnotes {
+  font-size: 0.9em;
+}
+
+/* Correct default behavior of SUP tag. By default, all browsers show SUP text 
+   the same size as normal text, but 0,5 lines higher. This also creates a space 
+   between this line and the previous one, which looks ugly. This CSS makes the top
+   of the SUP tag aligned with the normal top of the text of the same line, but lifts
+   up the bottom 30%, thus making it a superscript still. 
+*/
+sup {
+  vertical-align: top;
+  font-size: 0.7em;
+}
+
+
+/*
+ * Textile Footnotes 
+ */
+ /* First footnote */
+ #fn1 {
+   border-top: 1px solid #000000;
+   margin-top: 3em;
+ }
+ .footnote {
+   font-size: 0.9em;
+ }
+ 
