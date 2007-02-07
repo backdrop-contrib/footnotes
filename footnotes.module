@@ -226,7 +226,7 @@ function _footnotes_replace_callback_textile( $matches, $op = '' ) {
 */
 function footnotes_menu($may_cache) {
   if (!$may_cache) {
-    theme('add_style', drupal_get_path('module', 'footnotes') . '/footnotes.css');
+    drupal_add_css(drupal_get_path('module', 'footnotes') .'/footnotes.css');
   }
 }
 
