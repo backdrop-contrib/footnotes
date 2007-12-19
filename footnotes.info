@@ -1,0 +1,4 @@
+; $Id$
+name = Footnotes
+description = "Add automatically numbered footnotes to your posts."
+core = 6.x
