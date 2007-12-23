@@ -11,8 +11,7 @@ Use it together with the Textile module.
 
 By default, footnotes are placed at the end of the text. You can also use a 
 <footnotes> or <footnotes /> tag to position it anywhere you want. For Textile
-use "footnotes." tag. (This feature is quite new, please report any bugs you 
-find at http://drupal.org/node/add/project_issue/footnotes)
+use "footnotes." tag. 
 
 
 INSTALL INSTRUCTIONS FOR FOOTNOTES.MODULE
@@ -38,9 +37,16 @@ HTML FILTER
 Footnotes.module is designed such that it can be used together with Drupal's html filter,
 and in particular you should have footnotes first and html filter later.
 
-Footnotes outputs tags: <sup>, <a>, <div>, <ol>, <li>
-You should add these tags to your input formats that use html filter. This can be done at 
-administer > input formats > configure > configure > HTML filter
+This version of Footnotes has been redesigned so that it only outputs html tags that 
+are allowed in a default installation of HTML filter. 
+
+
+KNOWN ISSUES
+----
+
+This development version 5.x-1.x-dev reportedly does not render correctly on Mac OS.
+Issue is being investigated.
+http://drupal.org/node/166628
 
 
 COPYRIGHT AND ACKNOWLEDGEMENTS
