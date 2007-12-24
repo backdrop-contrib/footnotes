@@ -164,15 +164,15 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   
   if( $op == 'output footer' ) {
     if( $n > 0 ) {
-      $str = '<dl class="footnotes"><br />' . "\n";
+      $str = '<ol class="footnotes">';
       for( $m = 1; $m <= $n; $m++ ){
         $text = $store_matches[ $m - 1 ][0];
         $randstr = $store_matches[ $m - 1 ][1];
-        $str .= '<dt><a class="footnote" name="footnote' . $m . '_' . $randstr .
-                '" href="#footnoteref' . $m . '_' . $randstr . '">' . $m . '.</a></dt>';
-        $str .= '<dd>' . $text . "</dd>\n";
+        $str .= '<li><a class="footnote" name="footnote' . $m . '_' . $randstr .
+                '" href="#footnoteref' . $m . '_' . $randstr . '">' . $m . '.</a> ';
+        $str .= $text . "</li>\n";
       }
-      $str .= "</dl>\n";
+      $str .= "</ol>\n";
     }
     $n = 0;
     $store_matches = array();
@@ -197,6 +197,7 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   return '<a class="see_footnote" id="footnoteref' . $n . '_' . $randstr .
          '" title="' . $title . '" href="#footnote' . $n . '_' . $randstr . '">' . $n . '</a>';
 }
+
 
 /**
  * Helper function called from preg_replace_callback() above

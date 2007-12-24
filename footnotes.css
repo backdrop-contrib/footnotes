@@ -23,22 +23,37 @@
 */
 .see_footnote {
   vertical-align: top;
-  font-size: smaller;
+  position: relative;
+  top: -0.25em;
+  font-size: 0.9em;
 }
 
-/*
-  A series of tricks to make the dt and dd elements be on the same row.
-*/
-.footnotes dd,
-.footnotes dt {
-  margin: 0.1em;
+/* Hide the actual number of the OL list of footnotes*/
+ol.footnotes {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
 }
-.footnotes dd {
-  margin-left: 2em;
-  position: relative;
-  top: -2em;
-  margin-bottom: -2em;
+ol.footnotes li {
+  margin-left: 2.5em;
 }
+
+/* Move the footnote number outside of the margin for footnote text (hanging indent) */
+ol.footnotes {
+  /* This is apparently very needed for the "position: absolute;" below to work correctly*/
+  position: relative; 
+}
+.footnotes .footnote {
+  position: absolute;
+  left: 0px;
+  z-index: 2;
+}
+
+/* Note: This CSS has a minor bug on all versions of IE in that the footnote numbers 
+are aligned with the absolute bottom of their space, thus being a couple of pixels 
+lower than their corresponding line of text. IE5.5 has a serious bug in that the numbers 
+are not shifted left at all, thus being garbled together with the start of their text. */
+
 
 /*
  * Textile Footnotes 

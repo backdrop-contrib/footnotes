@@ -38,15 +38,18 @@ Footnotes.module is designed such that it can be used together with Drupal's htm
 and in particular you should have footnotes first and html filter later.
 
 This version of Footnotes has been redesigned so that it only outputs html tags that 
-are allowed in a default installation of HTML filter. 
+are allowed in a default installation of HTML filter. (Tags used are A, OL and LI.)
 
 
 KNOWN ISSUES
 ----
 
-This development version 5.x-1.x-dev reportedly does not render correctly on Mac OS.
-Issue is being investigated.
-http://drupal.org/node/166628
+This version uses a new markup for the list of footnotes. It is an OL list with 
+CSS taking away the browser generated list numbers and moving the link numbers 
+towards the left. All IE versions have a bug that the numbers are slightly lower 
+than the baseline of the footnote text. (If you know how to fix this, please tell.)
+In addition IE 5.5 has a more serious bug that the footnote number will be on top of
+the first letters of the footnote text. There doesn't seem to be a way to fix this.
 
 
 COPYRIGHT AND ACKNOWLEDGEMENTS
