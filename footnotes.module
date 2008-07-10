@@ -91,22 +91,24 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
 
         // We don't need the "prepare" operation for this filter, but it's required
         // to at least return the input text as-is.
-        //TODO: May need to escape <fn> if we use HTML filter too, but Footnotes could be first
         case 'prepare':
           return $text;
 
         // The actual filtering is performed here. The supplied text should be
         // returned, once any necessary substitutions have taken place.
         case 'process':
-          $text = preg_replace_callback('|<fn>(.*?)</fn>|s', '_footnotes_replace_callback', $text);
-          
+          $pattern = array('|\[fn](.*?)\[/fn]|s', '|<fn>(.*?)</fn>|s');
+          $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
+          //$text = preg_replace_callback('|<fn>(.*?)</fn>|s', '_footnotes_replace_callback', $text);
+
           //Replace tag <footnotes> with the list of footnotes.
           //If tag is not present, by default add the footnotes at the end.
           //Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 
           $footer = '';
           $footer = _footnotes_replace_callback(NULL, 'output footer');
-          if( preg_match( '/<footnotes(\/( )?)?>/', $text ) > 0 ) {
-            $text = preg_replace('/<footnotes(\/( )?)?>/', $footer, $text, 1);
+          $pattern = '/(\[footnotes(( )?\/)?\])|(<footnotes(( )?\/)?>)/';
+          if(preg_match($pattern, $text) > 0) {
+            $text = preg_replace($pattern, $footer, $text, 1);
             return $text;
           }
           else {

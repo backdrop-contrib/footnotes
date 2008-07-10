@@ -2,15 +2,19 @@
 
 The Footnotes module can be used to create automatically numbered footnotes
 within a text. In the place, where you want to add a footnote, enclose the
-footnote text within an fn tag: <fn>like this</fn>. The filter will take the
+footnote text within an fn tag: [fn]like this[/fn]. The filter will take the
 text within the tag and move it to a footnote at the bottom of the page. 
 In it's place it will place a number which is also a link to the footnote.
+
+As of version 2.0 Footnotes supports both [fn]square brackets[/fn] and 
+<fn>angle brackets</fn>. Square brackets support was added in particular
+to support WYSIWYG editors like FCKEditor and TinyMCE.
 
 There is also another filter which does the same with a Textile markup style.
 Use it together with the Textile module.
 
 By default, footnotes are placed at the end of the text. You can also use a 
-<footnotes> or <footnotes /> tag to position it anywhere you want. For Textile
+[footnotes] or [footnotes /] tag to position it anywhere you want. For Textile
 use "footnotes." tag. 
 
 
