@@ -24,7 +24,7 @@ function footnotes_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       // This description is shown in the listing at admin/modules.
-      return t('A filter to insert automatically numbered footnotes into Drupal texts.');
+      return t('Insert automatically numbered footnotes into Drupal texts.');
   }
 }
 
@@ -41,10 +41,10 @@ function footnotes_filter_tips($delta, $format, $long = FALSE) {
   switch ($delta) {
     case 0:
       if ($long) {
-        return t('You can insert footnotes directly into texts with <code>&lt;fn&gt;This text becomes a footnote.&lt;/fn&gt;</code>. This will be replaced with a running number (the footnote reference) and the text within the &lt;fn&gt; tags will be moved to the bottom of the page (the footnote).');
+        return t('You can insert footnotes directly into texts with <code>[fn]This text becomes a footnote.[/fn]</code>. This will be replaced with a running number (the footnote reference) and the text within the [fn] tags will be moved to the bottom of the page (the footnote).');
       }
       else {
-        return t('Use &lt;fn&gt;...&lt;/fn&gt; to insert automatically numbered footnotes.');
+        return t('Use [fn]...[/fn] (or &lt;fn&gt;...&lt;/fn&gt;) to insert automatically numbered footnotes.');
       }
       break;
 
@@ -71,7 +71,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
   // the returned name should be passed through t() for translation.
   if ($op == 'list') {
     return array(
-      0 => t('Footnotes &lt;fn&gt;'),
+      0 => t('Footnotes [fn]...[/fn]'),
       1 => t('Footnotes Textile style'));
   }
 
@@ -87,7 +87,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
         // This description is shown in the administrative interface, unlike the
         // filter tips which are shown in the content editing interface.
         case 'description':
-          return t('Use &lt;fn&gt;...&lt;/fn&gt; to insert automatically numbered footnotes.');
+        return t('Use [fn]...[/fn] (or &lt;fn&gt;...&lt;/fn&gt;) to insert automatically numbered footnotes.');
 
         // We don't need the "prepare" operation for this filter, but it's required
         // to at least return the input text as-is.
@@ -97,6 +97,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
         // The actual filtering is performed here. The supplied text should be
         // returned, once any necessary substitutions have taken place.
         case 'process':
+          // Supporting both [fn] and <fn> now. Thanks to fletchgqc http://drupal.org/node/268026
           $pattern = array('|\[fn](.*?)\[/fn]|s', '|<fn>(.*?)</fn>|s');
           $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
           //$text = preg_replace_callback('|<fn>(.*?)</fn>|s', '_footnotes_replace_callback', $text);
@@ -135,7 +136,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
         // returned, once any necessary substitutions have taken place.
         case 'process':
           $text = preg_replace_callback('|\[# (.*?)\]|s', '_footnotes_replace_callback_textile', $text);
-          
+
           //Replace Textile tag "footnotes." with the list of footnotes.
           //If tag is not present, by default add the footnotes at the end.
           //Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 

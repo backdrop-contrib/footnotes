@@ -1,6 +1,6 @@
 2008-07-10 Footnotes 2.0 (HEAD is 6.x-2.0)
 
- - Add support for using [fn]square brackets[/fn]
+ - Add support for using [fn]square brackets[/fn] (268026)
  - Change documentation to talk about [fn] by default, but <fn> is still supported
  - Mention http://drupal.org/node/279420 in known issues
  - 

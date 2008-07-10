@@ -55,6 +55,13 @@ than the baseline of the footnote text. (If you know how to fix this, please tel
 In addition IE 5.5 has a more serious bug that the footnote number will be on top of
 the first letters of the footnote text. There doesn't seem to be a way to fix this.
 
+The development version of Drupal7 has a bug in that CSS and JavaScript files added 
+by modules are absent from the page. If you are hit by this bug, your footnote references
+will not appear as supertext, and the list of footnotes will have duplicate numbering.
+There is a workaround to empty Drupal's cache table in 
+Administer > Site Configuration > Performance > Clear cached data
+after which everything works again. 
+To follow up on this bug: http://drupal.org/node/279420
 
 COPYRIGHT AND ACKNOWLEDGEMENTS
 ----
