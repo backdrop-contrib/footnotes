@@ -4,3 +4,4 @@
  - Change documentation to talk about [fn] by default, but <fn> is still supported
  - Mention http://drupal.org/node/279420 in known issues
  - Adding Better URL filter (fork from core). http://drupal.org/node/161217
+ - There appears to also be a French translation now. Thanks Beginner! (Japanese already done earlier.)
