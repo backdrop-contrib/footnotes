@@ -2,13 +2,15 @@
 
 The Footnotes module can be used to create automatically numbered footnotes
 within a text. In the place, where you want to add a footnote, enclose the
-footnote text within an fn tag: [fn]like this[/fn]. The filter will take the
-text within the tag and move it to a footnote at the bottom of the page. 
-In it's place it will place a number which is also a link to the footnote.
+footnote text within an fn tag: [fn]like this[/fn]. 
+NOTE: This version of Footnotes includes "Better URL filter". See below for 
+details.
 
-As of version 2.0 Footnotes supports both [fn]square brackets[/fn] and 
-<fn>angle brackets</fn>. Square brackets support was added in particular
-to support WYSIWYG editors like FCKEditor and TinyMCE.
+The filter will take the text within the tag and move it to a footnote at 
+the bottom of the page. In it's place it will place a number which is also 
+a link to the footnote. As of version 2.0 Footnotes supports both 
+[fn]square brackets[/fn] and <fn>angle brackets</fn>. Square brackets support 
+was added in particular to support WYSIWYG editors like FCKEditor and TinyMCE.
 
 There is also another filter which does the same with a Textile markup style.
 Use it together with the Textile module.
@@ -16,6 +18,22 @@ Use it together with the Textile module.
 By default, footnotes are placed at the end of the text. You can also use a 
 [footnotes] or [footnotes /] tag to position it anywhere you want. For Textile
 use "footnotes." tag. 
+
+
+BETTER URL FILTER
+----
+
+This version of Footnotes includes also a "Better URL filter". This is a fork of
+the URL filter in Drupal core filter.module. The original URL filter is buggy
+(or more accurately, very limited). If the enhancements in Better URL filter
+are ever committed to Drupal core, this filter will (obviously) be deprecated.
+(You can follow the bug in Drupal core URL filter here: http://drupal.org/node/161217)
+
+In particular Footnotes users have suffered from the Drupal URL filter not converting 
+URL's inside footnotes to links, however, the Better URL filter can be used by
+anyone wishing more correct URL filter functionality, even if you don't use footnotes.
+(You don't even need to enable the Footnotes filters to use the Better URL filter.)
+
 
 
 INSTALL INSTRUCTIONS FOR FOOTNOTES.MODULE

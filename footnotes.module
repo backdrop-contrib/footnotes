@@ -24,7 +24,7 @@ function footnotes_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       // This description is shown in the listing at admin/modules.
-      return t('Insert automatically numbered footnotes into Drupal texts.');
+      return t('Insert automatically numbered footnotes into Drupal texts. (Also includes Better URL filter.)');
   }
 }
 
@@ -56,6 +56,11 @@ function footnotes_filter_tips($delta, $format, $long = FALSE) {
         return t('Use [# ...] to insert automatically numbered footnotes. Textile variant.');
       }
       break;
+
+    case 99:
+      return t('Web page addresses and e-mail addresses turn into links automatically. (Better URL filter.)');
+      break;
+
   }
 }
 
@@ -72,7 +77,9 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
   if ($op == 'list') {
     return array(
       0 => t('Footnotes [fn]...[/fn]'),
-      1 => t('Footnotes Textile style'));
+      1 => t('Footnotes Textile style'),
+      99 => t('Better URL filter (fork from core)')
+    );
   }
 
   // All operations besides "list" provide a $delta argument so we know which
@@ -151,8 +158,28 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
           }
       }
       break;
+
+    case 99:
+      switch ($op) {
+        case 'description':
+          return t('Better URL filter: Turns web and e-mail addresses into clickable links. NOTE: This filter is an enhancement to the Drupal core URL filter and will be deprecated if the enhancements are ever committed to Drupal core. <a href="http://drupal.org/node/161217">#161217</a>');
+
+        // We don't need the "prepare" operation for this filter, but it's required
+        // to at least return the input text as-is.
+        case 'prepare':
+          return $text;
+
+        case 'process':
+          return _footnotes_filter_url($text, $format);
+
+        case 'settings':
+          return _footnotes_filter_url_settings($format);
+      }
+      break;
+
   }
 }
+
 
 /**
  * Helper function called from preg_replace_callback() above
@@ -333,3 +360,196 @@ function footnotes_is_footnotes_later( $format, $caller, $caller_delta=0, $footn
       //TODO: What is correct interpretation when weight is equal?
     }
 }
+
+
+
+
+
+
+/**********************************************************************************************************
+ * The URL filter shipped in Drupal core filter.module is buggy (or rather, too simple). Footnotes users
+ * in particular are affected since URL's in footnotes don't get converted into links even if they should.
+ *
+ * I've submitted a patch for a better URL filter a year ago, but the core developers have not committed it.
+ * There are no bugs or anything, just that nobody is paying attention.
+ * http://drupal.org/node/161217
+ *
+ * To end the misery, I'm publishing the good version of URL filter within the Footnotes module. The URL 
+ * filter related code is below, plus a few snippets above in footnotes_filter and footnotes_filter_tips.
+ *
+ * This forked "Better URL filter" will be deprecated if the code is ever committed to Drupal core.
+ **********************************************************************************************************
+ */
+
+
+
+
+/**
+ * Settings for URL filter.
+ */
+function _footnotes_filter_url_settings($format) {
+  $form['footnotes_filter_urlfilter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Better URL filter'),
+    '#collapsible' => TRUE,
+  );
+  $form['footnotes_filter_urlfilter']['footnotes_filter_url_length_' . $format] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum link text length'),
+    '#default_value' => variable_get('footnotes_filter_url_length_' . $format, 72),
+    '#maxlength' => 4,
+    '#description' => t('URLs longer than this number of characters will be truncated to prevent long strings that break formatting. The link itself will be retained; just the text portion of the link will be truncated.'),
+  );
+  return $form;
+}
+
+/**
+ * URL filter. Automatically converts text web addresses (URLs, e-mail addresses,
+ * ftp links, etc.) into hyperlinks.
+ */
+function _footnotes_filter_url($text, $format) {
+  // List of tags - the content of which must be skipped.
+  $ignoretags = 'a|script|style|code';
+
+  // This filter identifies and makes clickable links of 3 types of "links".
+  // 1) URL's like http://www.example.com.
+  // 2) e-mail addresses like name@example.com.
+  // 3) Web addresses without the "http://" protocol defined, like www.example.com.
+  // Each type must be processed separately, as there is no one regular expression
+  // that could possibly match all of the cases in one pass.
+  //
+  // Create an array which contains the regexps for each type of link.
+  // The key to the regexp is the name of a function that is used as
+  // callback function to process matches of the regexp. The callback function
+  // is to return the replacement for the match.
+  // The array is used and matching/replacement done below inside some loops.
+  $tasks = NULL;
+  // Match absolute URLs.
+  $protocols = 'http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://';
+  $urlpattern = "(?:$protocols)(?:[a-zA-Z0-9@:%_+*~#?&=.,/;-]*[a-zA-Z0-9@:%_+*~#&=/;-])";
+  $re = "`($urlpattern)([\.\,\?\!]*?)`i";
+  $tasks['_footnotes_filter_url_parse_full_links'] = $re;
+  // Match e-mail addresses.
+  // Note: The ICANN seems to be on track towards accepting more diverse top level domains,
+  // so this pattern has been "future-proofed" to allow for TLD's of length 2-64.
+  $urlpattern = '[A-Za-z0-9._-]+@[A-Za-z0-9._+-]+\.[A-Za-z]{2,64}';
+  $re = "`($urlpattern)`i";
+  $tasks['_footnotes_filter_url_parse_email_links'] = $re;
+  // Match www domains/addresses.
+  $urlpattern = 'www\.[a-zA-Z0-9@:%_+*~#?&=.,/;-]*[a-zA-Z0-9@:%_+~#\&=/;-]';
+  $re = "`($urlpattern)([\.\,\?\!]*?)`i";
+  $tasks['_footnotes_filter_url_parse_partial_links'] = $re;
+
+  // Pass length to regexp callback.
+  _footnotes_filter_url_trim(NULL, variable_get('footnotes_filter_url_length_' . $format, 72));
+
+  // We need to process each case of replacement type separately.
+  // The text must be joined and split again after each
+  // replacement, since replacements create new HTML tags and the new
+  // tags must be correctly protected before the next replacement can be done.
+  foreach ($tasks as $task => $re) {
+    // Split at all tags.
+    // This ensures that nothing that is a tagname or attribute will be processed.
+    $chunks = preg_split('/(<.+?>)/i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+    // Note: PHP ensures the array consists of alternating delimiters and literals
+    // and begins and ends with a literal (inserting NULL as required).
+    // Therefore, first chunk is always text:
+    $chunk_type = 'text';
+    // Tags to ignore are defined in $ignoretags (see above).
+    // If an ignoretag is found, it is stored here and removed only when the
+    // closing tag is found. Until the closing tag is found, no replacements are made.
+    $opentag = '';
+
+    for ($i = 0; $i < count($chunks); $i++) {
+      if ($chunk_type == 'text') {
+        // Only do replacements when there are no unclosed ignoretags.
+        if ($opentag == '') {
+          // This is the high point of this function! If there is a match,
+          // a link is created in the callback function named by $task.
+          $chunks[$i] = preg_replace_callback($re, $task, $chunks[$i]);
+        }
+        // Done processing text chunk, so next chunk is a tag.
+        $chunk_type = 'tag';
+      }
+      else {
+        if ($opentag == '') {
+          // No open ignoretags. Process this tag...
+          if (preg_match("`<($ignoretags)(?:\s|>)`i", $chunks[$i], $matches)) {
+            // This matches one of the $ignoretags.
+            // Catch and store the tag in question.
+            $opentag = $matches[1];
+          }
+        }
+        else {
+          // There is an $ignoretag open. See if this is a matching closing tag.
+          // Nothing else is done until we find the closing tag.
+          if (preg_match("`<\/$opentag>`i", $chunks[$i], $matches)) {
+            $opentag = '';
+          }
+        }
+        // Done processing tag chunk, so next chunk is text.
+        $chunk_type = 'text';
+      }
+    }
+  $text = implode($chunks);
+  }
+
+  return $text;
+}
+/**
+ * Callback function. Make links out of absolute URLs.
+ */
+function _footnotes_filter_url_parse_full_links($match) {
+  // The $i:th parenthesis in the regexp contains the URL.
+  $i = 1;
+
+  $match[$i] = decode_entities($match[$i]);
+  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
+  $match[$i] = check_url($match[$i]);
+  return '<a href="' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>' . $match[$i+1];
+}
+
+/**
+ * Callback function. Make links out of e-mail addresses.
+ */
+function _footnotes_filter_url_parse_email_links($match) {
+  // The $i:th parenthesis in the regexp contains the URL.
+  $i = 0;
+
+  $match[$i] = decode_entities($match[$i]);
+  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
+  $match[$i] = check_url($match[$i]);
+  return '<a href="mailto:' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>';
+}
+
+/**
+ * Callback function. Make links out of domain names starting with "www.".
+ */
+function _footnotes_filter_url_parse_partial_links($match) {
+  // The $i:th parenthesis in the regexp contains the URL.
+  $i = 1;
+
+  $match[$i] = decode_entities($match[$i]);
+  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
+  $match[$i] = check_plain($match[$i]);
+  return '<a href="http://' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>' . $match[$i+1];
+}
+
+/**
+ * Shortens long URLs to http://www.example.com/long/url...
+ */
+function _footnotes_filter_url_trim($text, $length = NULL) {
+  static $_length;
+  if ($length !== NULL) {
+    $_length = $length;
+  }
+
+  if (strlen($text) > $_length) {
+    $text = substr($text, 0, $_length) . '...';
+  }
+
+  return $text;
+}
+
+/**** End of Better URL filter code. Now returning to our normally scheduled Footnotes programming. *****/
+/********************************************************************************************************/

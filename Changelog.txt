@@ -3,4 +3,4 @@
  - Add support for using [fn]square brackets[/fn] (268026)
  - Change documentation to talk about [fn] by default, but <fn> is still supported
  - Mention http://drupal.org/node/279420 in known issues
- - 
+ - Adding Better URL filter (fork from core). http://drupal.org/node/161217
