@@ -5,3 +5,4 @@
  - Mention http://drupal.org/node/279420 in known issues
  - Adding Better URL filter (fork from core). http://drupal.org/node/161217
  - There appears to also be a French translation now. Thanks Beginner! (Japanese already done earlier.)
+ - Fix bug where teaser might cut into the middle of a footnote: http://drupal.org/node/253326
