@@ -1,4 +1,4 @@
 ; $Id$
 name = Footnotes
-description = "Add automatically numbered footnotes to your posts."
+description = "Add automatically numbered footnotes to your posts. (Includes Better URL filter.)"
 core = 6.x
