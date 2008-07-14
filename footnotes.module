@@ -104,6 +104,15 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
         // The actual filtering is performed here. The supplied text should be
         // returned, once any necessary substitutions have taken place.
         case 'process':
+          // Supporting both [fn] and <fn> now. Thanks to fletchgqc http://drupal.org/node/268026
+          // Convert all square brackets to angle brackets. This way all further code just
+          // manipulates angle brackets. (Angle brackets are preferred here for the simple reason
+          // that square brackets are more tedious to use in regexps.)
+          $text = preg_replace( '|\[fn([^\]]*)\]|', '<fn$1>', $text);
+          $text = preg_replace( '|\[/fn\]|', '</fn>', $text);
+          $text = preg_replace( '|\[footnotes([^\]]*)\]|', '<footnotes$1>', $text);
+
+
           // Check that there are an even number of open and closing tags.
           // If there is one closing tag missing, append this to the end.
           // If there is more disparity, throw a warning and continue.
@@ -118,26 +127,16 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
           elseif( $open_tags > $close_tags + 1) {
             trigger_error(t("You have unclosed fn tags. This is invalid and will produce unpredictable results."));
           }
-          $open_tags = preg_match_all("|[fn]|", $text, $foo);
-          $close_tags = preg_match_all("|[/fn]|", $text, $foo);
-          if($open_tags == $close_tags + 1) {
-            $text = $text . '[/fn]';
-          }
-          elseif( $open_tags > $close_tags + 1) {
-            trigger_error(t("You have unclosed fn tags. This is invalid xml and will produce unpredictable results"));
-          }
 
-          // Supporting both [fn] and <fn> now. Thanks to fletchgqc http://drupal.org/node/268026
-          $pattern = array('|\[fn\](.*?)\[/fn\]|s', '|<fn>(.*?)</fn>|s');
+          $pattern = '|<fn>(.*?)</fn>|s';
           $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
-          //$text = preg_replace_callback('|<fn>(.*?)</fn>|s', '_footnotes_replace_callback', $text);
 
           // Replace tag <footnotes> with the list of footnotes.
           // If tag is not present, by default add the footnotes at the end.
           // Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 
           $footer = '';
           $footer = _footnotes_replace_callback(NULL, 'output footer');
-          $pattern = '/(\[footnotes(( )?\/)?\])|(<footnotes(( )?\/)?>)/';
+          $pattern = '|(<footnotes([^\]]*)>)|';
           if(preg_match($pattern, $text) > 0) {
             $text = preg_replace($pattern, $footer, $text, 1);
             return $text;
@@ -214,7 +213,7 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   static $n = 0;
   static $store_matches = array();
   $str = '';
-  
+
   if( $op == 'output footer' ) {
     if( $n > 0 ) {
       $str = '<ol class="footnotes">';
