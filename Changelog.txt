@@ -1,7 +1,8 @@
-2008-07-10 Footnotes 2.0 (HEAD is 6.x-2.0)
+2008-07-23 Footnotes 2.0 (HEAD is 6.x-2.0)
 
  - Add support for using [fn]square brackets[/fn] (268026)
  - Change documentation to talk about [fn] by default, but <fn> is still supported
+ - Add support for specifying "value" attribute.
  - Mention http://drupal.org/node/279420 in known issues
  - Adding Better URL filter (fork from core). http://drupal.org/node/161217
  - There appears to also be a French translation now. Thanks Beginner! (Japanese already done earlier.)

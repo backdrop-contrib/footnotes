@@ -119,7 +119,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
           // A closing tag may sometimes be missing when we are processing a teaser
           // and it has been cut in the middle of the footnote. http://drupal.org/node/253326
           $foo = array();
-          $open_tags = preg_match_all("|<fn>|", $text, $foo);
+          $open_tags = preg_match_all("|<fn([^>]*)>|", $text, $foo);
           $close_tags = preg_match_all("|</fn>|", $text, $foo);
           if($open_tags == $close_tags + 1) {
             $text = $text . '</fn>';
@@ -128,7 +128,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
             trigger_error(t("You have unclosed fn tags. This is invalid and will produce unpredictable results."));
           }
 
-          $pattern = '|<fn>(.*?)</fn>|s';
+          $pattern = '|<fn([^>]*)>(.*?)</fn>|s';
           $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
 
           // Replace tag <footnotes> with the list of footnotes.
@@ -215,13 +215,14 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   $str = '';
 
   if( $op == 'output footer' ) {
-    if( $n > 0 ) {
+    if (count($store_matches) > 0) {
       $str = '<ol class="footnotes">';
-      for( $m = 1; $m <= $n; $m++ ){
-        $text = $store_matches[ $m - 1 ][0];
-        $randstr = $store_matches[ $m - 1 ][1];
-        $str .= '<li><a class="footnote" name="footnote' . $m . '_' . $randstr .
-                '" href="#footnoteref' . $m . '_' . $randstr . '">' . $m . '.</a> ';
+      // loop through the stored footnotes
+      foreach ($store_matches as $fn_attr) {
+        list($text,$value,$value_id,$randstr) = $fn_attr; 
+        $str .= '<li><a class="footnote" id="footnote' . $value_id . '_' .
+                $randstr .'" href="#footnoteref' . $value_id . '_' . 
+                $randstr . '">' . $value . '.</a> ';
         $str .= $text . "</li>\n";
       }
       $str .= "</ol>\n";
@@ -232,22 +233,50 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   }
 
 
-  //default op: act as called by preg_replace_callback()
-  //Random string used to ensure footnote id's are unique, even 
-  //when contents of multiple nodes reside on same page. (fixes http://drupal.org/node/194558)
+  // Default op: act as called by preg_replace_callback()
+  // Random string used to ensure footnote id's are unique, even
+  // when contents of multiple nodes reside on same page. (fixes http://drupal.org/node/194558)
   $randstr = _footnotes_helper_randstr();
 
-  array_push( $store_matches, array( $matches[1], $randstr ) );
-  $n++;
+  $value = '';
+  // Did the pattern match anything in the <fn> tag?
+  if ($matches[1]) {
+    // See if value attribute can parsed, either well-formed in quotes eg <fn value="3">
+    if (preg_match('|value=["\'](.*?)["\']|',$matches[1],$value_match)) {
+      $value = $value_match[1];
+    // Or without quotes eg <fn value=8>
+    } elseif (preg_match('|value=(\S*)|',$matches[1],$value_match)) {
+      $value = $value_match[1];
+    }
+  }
+
+  if ($value) {
+    // A value label was found. If it is numeric, record it in $n so further notes 
+    // can increment from there.
+    if (is_numeric($value)) {
+      $n = $value;
+    }
+  } else {
+    // No value label, either a plain <fn> or unparsable attributes. Increment the 
+    // footnote counter, set label equal to it.
+    $n++;
+    $value = $n;
+  }
+
+  // Remove illegal characters from $value so it can be used as an HTML id attribute.
+  $value_id = preg_replace('|[^\w\-]|', '', $value);
+  // Store the footnote text, the footnote value label, and randstr 
+  array_push( $store_matches, array( $matches[2], $value, $value_id, $randstr) );
+
   $allowed_tags = array();
-  $title = filter_xss($matches[1], $allowed_tags);
-  //html attribute cannot contain quotes
+  $title = filter_xss($matches[2], $allowed_tags);
+  // HTML attribute cannot contain quotes
   $title = str_replace('"', "&quot;", $title);
-  //remove newlines. Browsers don't support them anyway and they'll confuse line break converter in filter.module
+  // Remove newlines. Browsers don't support them anyway and they'll confuse line break converter in filter.module
   $title = str_replace("\n", " ", $title);
   $title = str_replace("\r", "", $title);
-  return '<a class="see_footnote" id="footnoteref' . $n . '_' . $randstr .
-         '" title="' . $title . '" href="#footnote' . $n . '_' . $randstr . '">' . $n . '</a>';
+  return '<a class="see_footnote" id="footnoteref' . $value_id . '_' . $randstr .
+         '" title="' . $title . '" href="#footnote' . $value_id . '_' . $randstr . '">' . $value . '</a>';
 }
 
 
@@ -288,7 +317,7 @@ function _footnotes_replace_callback_textile( $matches, $op = '' ) {
 function _footnotes_helper_randstr() {
   $chars = "abcdefghijklmnopqrstuwxyz1234567890";
   $str = "";
-  
+
   //seeding with srand() not neccessary in modern PHP versions
   for( $i = 0; $i < 7; $i++ ) {
     $n = rand( 0, strlen( $chars ) - 1 );

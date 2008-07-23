@@ -12,12 +12,10 @@ a link to the footnote. As of version 2.0 Footnotes supports both
 [fn]square brackets[/fn] and <fn>angle brackets</fn>. Square brackets support 
 was added in particular to support WYSIWYG editors like FCKEditor and TinyMCE.
 
-There is also another filter which does the same with a Textile markup style.
-Use it together with the Textile module.
-
-By default, footnotes are placed at the end of the text. You can also use a 
-[footnotes] or [footnotes /] tag to position it anywhere you want. For Textile
-use "footnotes." tag. 
+Also supported in 2.0 is the use of a "value" attribute to a) set the numbering
+to use as a label or b) to set an arbitrary text string as label. Ex:
+ <fn value="5">This becomes footnote #5. Subsequent are #6, #7...</fn>
+ <fn value="*">This footnote is assigned the label "*"</fn>
 
 
 BETTER URL FILTER
@@ -33,6 +31,21 @@ In particular Footnotes users have suffered from the Drupal URL filter not conve
 URL's inside footnotes to links, however, the Better URL filter can be used by
 anyone wishing more correct URL filter functionality, even if you don't use footnotes.
 (You don't even need to enable the Footnotes filters to use the Better URL filter.)
+
+
+TEXTILE STYLE FOOTNOTES
+----
+
+There is also another filter which does the same with a Textile markup style.
+Use it together with the Textile module.
+
+By default, footnotes are placed at the end of the text. You can also use a 
+[footnotes] or [footnotes /] tag to position it anywhere you want. For Textile
+use "footnotes." tag. 
+
+Note: The Textile style filter is no longer actively developed and may become
+deprecated. It is better to use the <fn>...</fn> or [fn]...[/fn] style footnotes 
+with any markup you are using.
 
 
 
@@ -84,8 +97,8 @@ To follow up on this bug: http://drupal.org/node/279420
 COPYRIGHT AND ACKNOWLEDGEMENTS
 ----
 
-Footnotes.module is copyrighted by Henrik Ingo. It is licensed by the same conditions as Drupal 
-itself. (GPL license)
+Footnotes.module is copyrighted by Henrik Ingo and other contributors. It is licensed by 
+the same conditions as Drupal itself. (GPL license)
 
 Footnotes.module was originally created by henrik.ingo@avoinelama.fi ("hingo" on drupal.org)
 in the summer of 2006.
