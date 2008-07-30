@@ -337,6 +337,8 @@ function _footnotes_helper_randstr() {
 
 /**
  * Implementation of hook_theme()
+ *
+ * Thanks to emfabric for this implementation. http://drupal.org/node/221156
  */
 function footnotes_theme( ) {
   return array(
