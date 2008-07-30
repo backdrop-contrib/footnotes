@@ -216,16 +216,9 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
 
   if( $op == 'output footer' ) {
     if (count($store_matches) > 0) {
-      $str = '<ol class="footnotes">';
-      // loop through the stored footnotes
-      foreach ($store_matches as $fn_attr) {
-        list($text,$value,$value_id,$randstr) = $fn_attr; 
-        $str .= '<li><a class="footnote" id="footnote' . $value_id . '_' .
-                $randstr .'" href="#footnoteref' . $value_id . '_' . 
-                $randstr . '">' . $value . '.</a> ';
-        $str .= $text . "</li>\n";
-      }
-      $str .= "</ol>\n";
+      // Only if there are stored fn matches, pass the array of fns to be themed
+      // as a list
+      $str = theme('footnote_list',$store_matches);
     }
     $n = 0;
     $store_matches = array();
@@ -251,13 +244,13 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   }
 
   if ($value) {
-    // A value label was found. If it is numeric, record it in $n so further notes 
+    // A value label was found. If it is numeric, record it in $n so further notes
     // can increment from there.
     if (is_numeric($value)) {
       $n = $value;
     }
   } else {
-    // No value label, either a plain <fn> or unparsable attributes. Increment the 
+    // No value label, either a plain <fn> or unparsable attributes. Increment the
     // footnote counter, set label equal to it.
     $n++;
     $value = $n;
@@ -265,19 +258,35 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
 
   // Remove illegal characters from $value so it can be used as an HTML id attribute.
   $value_id = preg_replace('|[^\w\-]|', '', $value);
-  // Store the footnote text, the footnote value label, and randstr 
-  array_push( $store_matches, array( $matches[2], $value, $value_id, $randstr) );
 
+  // Create a sanitized version of $text that is suitable for using as HTML attribute
+  // value. (In particular, as the title attribute to the footnote link.)
   $allowed_tags = array();
-  $title = filter_xss($matches[2], $allowed_tags);
+  $text_clean = filter_xss($matches['2'], $allowed_tags);
   // HTML attribute cannot contain quotes
-  $title = str_replace('"', "&quot;", $title);
+  $text_clean = str_replace('"', "&quot;", $text_clean);
   // Remove newlines. Browsers don't support them anyway and they'll confuse line break converter in filter.module
-  $title = str_replace("\n", " ", $title);
-  $title = str_replace("\r", "", $title);
-  return '<a class="see_footnote" id="footnoteref' . $value_id . '_' . $randstr .
-         '" title="' . $title . '" href="#footnote' . $value_id . '_' . $randstr . '">' . $value . '</a>';
+  $text_clean = str_replace("\n", " ", $text_clean);
+  $text_clean = str_replace("\r", "", $text_clean);
+
+
+  // Create a footnote item as an array.
+  $fn = array(
+    'value' => $value,
+    'text' => $matches[2],
+    'text_clean' => $text_clean,
+    'fn_id' => 'footnote' . $value_id . '_' . $randstr,
+    'ref_id' => 'footnoteref' . $value_id . '_' . $randstr
+  );
+
+  // Store the footnote item.
+  array_push( $store_matches, $fn );
+  // Return the item themed into a footnote link.
+  return theme('footnote_link',$fn);
 }
+
+
+
 
 
 /**
@@ -325,6 +334,63 @@ function _footnotes_helper_randstr() {
   }
   return $str;
 }
+
+/**
+ * Implementation of hook_theme()
+ */
+function footnotes_theme( ) {
+  return array(
+    'footnote_link' => array(
+      'arguments' => array('fn' => NULL)
+    ),
+    'footnote_list' => array(
+      'arguments' => array('footnotes' => NULL)
+    )
+  );
+}
+
+/**
+ * Themed output of a footnote link appearing in the text body
+ *
+ * Accepts a single associative array, containing values on the following keys:
+ *   text   - the raw unprocessed text extracted from within the [fn] tag
+ *   text_clean   - a sanitized version of the previous, may be used as HTML attribute value
+ *   value  - the raw unprocessed footnote number or other identifying label
+ *   fn_id  - the globally unique identifier for the in-body footnote link
+ *            anchor, used to allow links from the list to the body
+ *   ref_id - the globally unique identifier for the footnote's anchor in the
+ *            footnote listing, used to allow links to the list from the body
+ */
+function theme_footnote_link($fn) {
+  return '<a class="see_footnote" id="' . $fn['ref_id'] . 
+         '" title="' . $fn['text_clean'] . '" href="#' . $fn['fn_id'] . '">' .
+         $fn['value'] . '</a>';
+}
+
+/**
+ * Themed output of the footnotes list appearing at at [footnotes]
+ *
+ * Accepts an array containing an ordered listing of associative arrays, each 
+ * containing values on the following keys:
+ *   text   - the raw unprocessed text extracted from within the [fn] tag
+ *   text_clean   - a sanitized version of the previous, may be used as HTML attribute value
+ *   value  - the raw unprocessed footnote number or other identifying label
+ *   fn_id  - the globally unique identifier for the in-body footnote link
+ *            anchor, used to allow links from the list to the body
+ *   ref_id - the globally unique identifier for the footnote's anchor in the
+ *            footnote listing, used to allow links to the list from the body
+ */
+function theme_footnote_list($footnotes) {
+  $str = '<ol class="footnotes">';
+  // loop through the footnotes
+  foreach ($footnotes as $fn) {
+    $str .= '<li><a class="footnote" id="' . $fn['fn_id'] .'" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
+    $str .= $fn['text'] . "</li>\n";
+  }
+  $str .= "</ol>\n";
+  return $str;
+}
+
 
 /**
 * Implementation of hook_init()

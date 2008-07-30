@@ -1,9 +1,10 @@
-2008-07-23 Footnotes 2.0 (HEAD is 6.x-2.0)
+2008-07-30 Footnotes 2.0
 
  - Add support for using [fn]square brackets[/fn] (268026)
  - Change documentation to talk about [fn] by default, but <fn> is still supported
- - Add support for specifying "value" attribute.
+ - Add support for specifying "value" attribute. (emfabric 282104)
  - Mention http://drupal.org/node/279420 in known issues
  - Adding Better URL filter (fork from core). http://drupal.org/node/161217
  - There appears to also be a French translation now. Thanks Beginner! (Japanese already done earlier.)
  - Fix bug where teaser might cut into the middle of a footnote: http://drupal.org/node/253326
+ - Start using the Drupal theme system, footnotes can now be themed by site admins (emfabric 221156)
