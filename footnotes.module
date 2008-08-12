@@ -395,15 +395,17 @@ function theme_footnote_list($footnotes) {
 
 
 /**
-* Implementation of hook_init()
+* Implementation of hook_menu()
 *
 * Add special css for Footnotes module.
 *
 * Thanks to binford2k@lug.wsu.edu for this tip and drinkypoo
 * for the question leading up to it. http://drupal.org/node/80538
 */
-function footnotes_init() {
-  drupal_add_css(drupal_get_path('module', 'footnotes') .'/footnotes.css');
+function footnotes_menu( $may_cache ) {
+  if( !$may_cache ) {
+    drupal_add_css(drupal_get_path('module', 'footnotes') .'/footnotes.css');
+  }
 }
 
 /**
