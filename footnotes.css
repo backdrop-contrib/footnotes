@@ -8,6 +8,7 @@
 
 /* Add empty space before footnotes and a black line on top. */
 .footnotes {
+  clear: both;
   margin-top: 4em;
   margin-bottom: 2em;
   border-top: 1px solid #000000;
