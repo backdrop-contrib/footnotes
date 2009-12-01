@@ -36,6 +36,7 @@ ol.footnotes {
   padding-left: 0;
 }
 ol.footnotes li {
+  list-style-type: none;
   margin-left: 2.5em;
 }
 
