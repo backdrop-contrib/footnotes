@@ -10,6 +10,11 @@
  * but can be used with any input format. The second filter outputs footnotes in 
  * Textile format. This means you should run this filter together and before the 
  * Textile filter.
+ * Note: The Textile filter is no longer maintained.
+ * 
+ * The Better URL filter is a fork of the URL filter in Drupal core filter.module. The
+ * original filter in core is too simple when parsing and does not make links in footnotes clickable
+ * (in addition to many other bugs).
  */
 
 /**
