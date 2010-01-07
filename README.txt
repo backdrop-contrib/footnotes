@@ -1,8 +1,11 @@
 // $Id$
 
 The Footnotes module can be used to create automatically numbered footnotes
-within a text. In the place, where you want to add a footnote, enclose the
-footnote text within an fn tag: [fn]like this[/fn]. 
+within a text. In the place where you want to add a footnote enclose the
+footnote text within an fn tag: [fn]like this[/fn]. By default, footnotes 
+are placed at the end of the text. You can also use a [footnotes] or 
+[footnotes /] tag to position it anywhere you want. 
+
 NOTE: This version of Footnotes includes "Better URL filter". See below for 
 details.
 
@@ -14,8 +17,16 @@ was added in particular to support WYSIWYG editors like FCKEditor and TinyMCE.
 
 Also supported in 2.0 is the use of a "value" attribute to a) set the numbering
 to use as a label or b) to set an arbitrary text string as label. Ex:
- <fn value="5">This becomes footnote #5. Subsequent are #6, #7...</fn>
- <fn value="*">This footnote is assigned the label "*"</fn>
+ [fn value="5"]This becomes footnote #5. Subsequent are #6, #7...[/fn]
+ [fn value="*"]This footnote is assigned the label "*"[/fn]
+
+As of version 2.2 you can have multiple references to the same footnote in the 
+text body.
+ [fn value="5"]This becomes footnote #5.[/fn]
+ [fn value="5"]This is a reference to the same footnote #5, this text itself is discarded.[/fn]
+
+Version 2.2 also includes TinyMCE support as a seprate module tinymce_footnotes. See
+that module's own README file for information.
 
 
 BETTER URL FILTER
@@ -38,10 +49,6 @@ TEXTILE STYLE FOOTNOTES
 
 There is also another filter which does the same with a Textile markup style.
 Use it together with the Textile module.
-
-By default, footnotes are placed at the end of the text. You can also use a 
-[footnotes] or [footnotes /] tag to position it anywhere you want. For Textile
-use "footnotes." tag. 
 
 Note: The Textile style filter is no longer actively developed and may become
 deprecated. It is better to use the <fn>...</fn> or [fn]...[/fn] style footnotes 
@@ -79,7 +86,7 @@ are allowed in a default installation of HTML filter. (Tags used are A, OL and L
 KNOWN ISSUES
 ----
 
-This version uses a new markup for the list of footnotes. It is an OL list with 
+Version 2.0 uses a new markup for the list of footnotes. It is an OL list with 
 CSS taking away the browser generated list numbers and moving the link numbers 
 towards the left. All IE versions have a bug that the numbers are slightly lower 
 than the baseline of the footnote text. (If you know how to fix this, please tell.)

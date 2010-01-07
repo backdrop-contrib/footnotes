@@ -1,3 +1,15 @@
+2010-09-07 Footnotes 2.2
+ - Add TinyMCE support as a separate plugin tinymce_footnotes (thanks elgreg #464066)
+ - Can have multiple references to same footnote in body by repeating value="" (#636808)
+Small fixes
+ - Add "ol.footnotes li { list-style-type: none;" Fixes #628994
+ - Rename (or rather copy) footnotes-alternative_layout.css due to typo in filename.
+ - move translations from /po/ to /translations/
+
+2008-09-07 Footnotes 2.1
+
+ - Add "clear: both" to css of footnotes section. http://drupal.org/node/303828
+
 2008-07-30 Footnotes 2.0
 
  - Add support for using [fn]square brackets[/fn] (268026)

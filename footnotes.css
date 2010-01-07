@@ -56,6 +56,16 @@ are aligned with the absolute bottom of their space, thus being a couple of pixe
 lower than their corresponding line of text. IE5.5 has a serious bug in that the numbers 
 are not shifted left at all, thus being garbled together with the start of their text. */
 
+/* 
+  Make the multiple backlinks a supertext^1
+*/
+.footnotes .footnote_multi {
+  vertical-align: top;
+  position: relative;
+  top: -0.25em;
+  font-size: 0.75em;
+}
+
 
 /*
  * Textile Footnotes 

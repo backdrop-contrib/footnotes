@@ -217,6 +217,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
 function _footnotes_replace_callback( $matches, $op = '' ) {
   static $n = 0;
   static $store_matches = array();
+  static $used_values = array();
   $str = '';
 
   if( $op == 'output footer' ) {
@@ -251,7 +252,9 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   if ($value) {
     // A value label was found. If it is numeric, record it in $n so further notes
     // can increment from there.
-    if (is_numeric($value)) {
+    // After adding support for multiple references to same footnote in the body (http://drupal.org/node/636808)
+    // also must check that $n is monotonously increasing
+    if ( is_numeric($value) && $n < $value ) {
       $n = $value;
     }
   } else {
@@ -284,14 +287,37 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
     'ref_id' => 'footnoteref' . $value_id . '_' . $randstr
   );
 
-  // Store the footnote item.
-  array_push( $store_matches, $fn );
+  // We now allow to repeat the footnote value label, in which case the link to the previously
+  // existing footnote is returned. Content of the current footnote is ignored.
+  // See http://drupal.org/node/636808
+  if( ! in_array( $value, $used_values ) )
+  {
+    // This is the normal case, add the footnote to $store_matches
+
+    // Store the footnote item.
+    array_push( $store_matches, $fn );
+    array_push( $used_values, $value );
+  }
+  else
+  {
+    // A footnote with the same label already exists
+
+    // Use the text and id from the first footnote with this value. 
+    // Any text in this footnote is discarded.
+    $i = array_search( $value, $used_values );
+    $fn['text'] = $store_matches[$i]['text'];
+    $fn['text_clean'] = $store_matches[$i]['text_clean'];
+    $fn['fn_id'] = $store_matches[$i]['fn_id'];
+    // Push the new ref_id into the first occurence of this footnote label
+    // The stored footnote thus holds a list of ref_id's rather than just one id
+    $ref_array = is_array($store_matches[$i]['ref_id']) ? $store_matches[$i]['ref_id'] : array( $store_matches[$i]['ref_id'] );
+    array_push( $ref_array, $fn['ref_id'] );
+    $store_matches[$i]['ref_id'] = $ref_array;
+  }
+
   // Return the item themed into a footnote link.
   return theme('footnote_link',$fn);
 }
-
-
-
 
 
 /**
@@ -391,8 +417,29 @@ function theme_footnote_list($footnotes) {
   $str = '<ol class="footnotes">';
   // loop through the footnotes
   foreach ($footnotes as $fn) {
-    $str .= '<li><a class="footnote" id="' . $fn['fn_id'] .'" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
-    $str .= $fn['text'] . "</li>\n";
+    if( ! is_array( $fn['ref_id'] ) )
+    {
+      // Output normal footnote
+      $str .= '<li><a class="footnote" id="' . $fn['fn_id'] .'" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
+      $str .= $fn['text'] . "</li>\n";
+    }
+    else
+    {
+      // Output footnote that has more than one reference to it in the body.
+      // The only difference is to insert backlinks to all references.
+      // Helper: we need to enumerate a, b, c...
+      $abc = str_split("abcdefghijklmnopqrstuvwxyz"); $i = 0;
+
+      $str .= '<li><span class="footnote" id="' . $fn['fn_id'] .'">' . $fn['value'] . '.</span> ';
+      foreach ( $fn['ref_id'] as $ref ) 
+      {
+        $str .= '<a class="footnote_multi" href="#' . $ref . '">' . $abc[$i] . '.</a> ';
+        $i++;
+      }
+      $str .= $fn['text'] . "</li>\n";   
+    }
+    
+
   }
   $str .= "</ol>\n";
   return $str;
