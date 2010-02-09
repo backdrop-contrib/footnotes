@@ -620,7 +620,7 @@ function _footnotes_filter_url($text, $format) {
   // tags must be correctly protected before the next replacement can be done.
   foreach ($tasks as $task => $re) {
     // Split at all tags.
-    // This ensures that nothing that is a tagname or attribute will be processed.
+    // This ensures that nothing that is a tagname or attribute or html comment will be processed.
     $chunks = preg_split('/(<.+?>)/i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
     // Note: PHP ensures the array consists of alternating delimiters and literals
     // and begins and ends with a literal (inserting NULL as required).
