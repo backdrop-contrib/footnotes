@@ -226,8 +226,11 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
       // as a list
       $str = theme('footnote_list',$store_matches);
     }
+    // Reset the static variables so they can be used again next time
     $n = 0;
     $store_matches = array();
+    $used_values = array();
+
     return $str;
   }
 
