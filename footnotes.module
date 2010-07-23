@@ -417,7 +417,7 @@ function theme_footnote_link($fn) {
  *            footnote listing, used to allow links to the list from the body
  */
 function theme_footnote_list($footnotes) {
-  $str = '<ol class="footnotes">';
+  $str = '<ul class="footnotes">';
   // loop through the footnotes
   foreach ($footnotes as $fn) {
     if( ! is_array( $fn['ref_id'] ) )
@@ -444,7 +444,7 @@ function theme_footnote_list($footnotes) {
     
 
   }
-  $str .= "</ol>\n";
+  $str .= "</ul>\n";
   return $str;
 }
 
