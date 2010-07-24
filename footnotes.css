@@ -30,15 +30,12 @@
 }
 
 /* Hide the bullet of the UL list of footnotes*/
-/* The ol.* selector is here for backward compatibility. Previous footnote
-   versions used ol lists and old sites will have such HTML in old posts */
-ol.footnotes, 
+
 ul.footnotes {
   list-style-type: none;
   margin-left: 0;
   padding-left: 0;
 }
-ol.footnotes li,
 ul.footnotes li {
   margin-left: 2.5em;
   list-style-type: none;
@@ -47,16 +44,25 @@ ul.footnotes li {
 
 
 /* Move the footnote number outside of the margin for footnote text (hanging indent) */
-ol.footnotes,
 ul.footnotes {
   /* This is apparently very needed for the "position: absolute;" below to work correctly*/
   position: relative; 
 }
-.footnotes .footnote {
+.footnotes .footnote_label {
   position: absolute;
   left: 0px;
   z-index: 2;
 }
+
+/* Highlight the target footnote (or ref number, if a backlink was used) when user clicks a footnote. */
+.see_footnote:target,
+.footnotes .footnote:target {
+  background-color: #eeeeee;
+}
+.see_footnote:target {
+  border: solid 1px #aaaaaa;
+}
+
 
 /* Note: This CSS has a minor bug on all versions of IE in that the footnote numbers 
 are aligned with the absolute bottom of their space, thus being a couple of pixels 
