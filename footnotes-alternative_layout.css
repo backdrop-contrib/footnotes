@@ -24,7 +24,7 @@
 /* 
   Make the footnote a supertext^1
 */
-.see_footnote {
+.see-footnote {
   vertical-align: top;
   position: relative;
   top: -0.25em;
@@ -45,7 +45,7 @@ ul.footnotes li {
 }
 
 
-.footnotes .footnote_label {
+.footnotes .footnote-label {
   vertical-align: top;
   position: relative;
   top: -0.35em;
@@ -54,11 +54,11 @@ ul.footnotes li {
 }
 
 /* Highlight the target footnote (or ref number, if a backlink was used) when user clicks a footnote. */
-.see_footnote:target,
+.see-footnote:target,
 .footnotes .footnote:target {
   background-color: #eeeeee;
 }
-.see_footnote:target {
+.see-footnote:target {
   border: solid 1px #aaaaaa;
 }
 
@@ -66,7 +66,7 @@ ul.footnotes li {
 /* 
   Make the multiple backlinks a supertext^1
 */
-.footnotes .footnote_multi {
+.footnotes .footnote-multi {
   vertical-align: top;
   position: relative;
   top: -0.25em;

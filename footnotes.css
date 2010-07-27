@@ -22,7 +22,7 @@
 /* 
   Make the footnote a supertext^1
 */
-.see_footnote {
+.see-footnote {
   vertical-align: top;
   position: relative;
   top: -0.25em;
@@ -48,18 +48,18 @@ ul.footnotes {
   /* This is apparently very needed for the "position: absolute;" below to work correctly*/
   position: relative; 
 }
-.footnotes .footnote_label {
+.footnotes .footnote-label {
   position: absolute;
   left: 0px;
   z-index: 2;
 }
 
 /* Highlight the target footnote (or ref number, if a backlink was used) when user clicks a footnote. */
-.see_footnote:target,
+.see-footnote:target,
 .footnotes .footnote:target {
   background-color: #eeeeee;
 }
-.see_footnote:target {
+.see-footnote:target {
   border: solid 1px #aaaaaa;
 }
 
@@ -72,7 +72,7 @@ are not shifted left at all, thus being garbled together with the start of their
 /* 
   Make the multiple backlinks a supertext^1
 */
-.footnotes .footnote_multi {
+.footnotes .footnote-multi {
   vertical-align: top;
   position: relative;
   top: -0.25em;

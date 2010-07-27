@@ -398,7 +398,7 @@ function footnotes_theme( ) {
  *            footnote listing, used to allow links to the list from the body
  */
 function theme_footnote_link($fn) {
-  return '<a class="see_footnote" id="' . $fn['ref_id'] . 
+  return '<a class="see-footnote" id="' . $fn['ref_id'] . 
          '" title="' . $fn['text_clean'] . '" href="#' . $fn['fn_id'] . '">' .
          $fn['value'] . '</a>';
 }
@@ -423,7 +423,7 @@ function theme_footnote_list($footnotes) {
     if( ! is_array( $fn['ref_id'] ) )
     {
       // Output normal footnote
-      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><a class="footnote_label" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
+      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><a class="footnote-label" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
       $str .= $fn['text'] . "</li>\n";
     }
     else
@@ -433,10 +433,10 @@ function theme_footnote_list($footnotes) {
       // Helper: we need to enumerate a, b, c...
       $abc = str_split("abcdefghijklmnopqrstuvwxyz"); $i = 0;
 
-      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><span class="footnote_label">' . $fn['value'] . '.</span> ';
+      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><span class="footnote-label">' . $fn['value'] . '.</span> ';
       foreach ( $fn['ref_id'] as $ref ) 
       {
-        $str .= '<a class="footnote_multi" href="#' . $ref . '">' . $abc[$i] . '.</a> ';
+        $str .= '<a class="footnote-multi" href="#' . $ref . '">' . $abc[$i] . '.</a> ';
         $i++;
       }
       $str .= $fn['text'] . "</li>\n";   
