@@ -1,11 +1,12 @@
 /*
  * CSS specific to Footnotes module.
- *
- * This is an alternative layout, it is not so nice but overcomes
- * the layout bugs on IE. http://drupal.org/node/166628
- * To use this layout, just rename this file to footnotes.css.
- */
- 
+ *                                                                             
+ * This is an alternative layout, it is not so nice but overcomes              
+ * the layout bugs on IE. http://drupal.org/node/166628                        
+ * To use this layout, just rename this file to footnotes.css.                 
+ */                                                                            
+
+
 
 /* Add empty space before footnotes and a black line on top. */
 .footnotes {
@@ -30,22 +31,48 @@
   font-size: 0.9em;
 }
 
-/* Hide the actual number of the OL list of footnotes*/
-ol.footnotes {
+/* Hide the bullet of the UL list of footnotes*/
+
+ul.footnotes {
   list-style-type: none;
   margin-left: 0;
   padding-left: 0;
 }
-ol.footnotes li {
+ul.footnotes li {
   margin-left: 0.5em;
+  list-style-type: none;
+  background: none; /* Garland theme sets a bullet via background image, this must be unset! See bug 861634 */
 }
-.footnotes .footnote {
+
+
+.footnotes .footnote_label {
   vertical-align: top;
   position: relative;
   top: -0.35em;
   left: -0.35em;
   font-size: 0.8em;
 }
+
+/* Highlight the target footnote (or ref number, if a backlink was used) when user clicks a footnote. */
+.see_footnote:target,
+.footnotes .footnote:target {
+  background-color: #eeeeee;
+}
+.see_footnote:target {
+  border: solid 1px #aaaaaa;
+}
+
+
+/* 
+  Make the multiple backlinks a supertext^1
+*/
+.footnotes .footnote_multi {
+  vertical-align: top;
+  position: relative;
+  top: -0.25em;
+  font-size: 0.75em;
+}
+
 
 /*
  * Textile Footnotes 

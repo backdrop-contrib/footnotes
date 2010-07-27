@@ -23,6 +23,11 @@ you have used these in your own themes, please change your CSS accordingly:
 Due to changes in HTML and CSS, <strong>you need to clear the Drupal cache</strong>
 after upgrading to version 2.4 or later.
 
+The erroneously named "footnotes-aternative_layout.css" file had been kept for
+backward compatibility but is now removed in 2.4. The correct file is 
+"footnotes-alternative_layout.css". This file was updated to reflect changes in
+the default css file.
+
 This release also includes "Better URL filter", which can be used to replace the 
 (incomplete) URL filter available in Drupal core. Especially Footnotes users have 
 suffered from the current URL filter, so the inclusion of a fixed URL filter in 
