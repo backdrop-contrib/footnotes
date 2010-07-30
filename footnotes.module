@@ -69,6 +69,28 @@ function footnotes_filter_tips($delta, $format, $long = FALSE) {
   }
 }
 
+
+/**
+ * Options for the Footnotes filter.
+ *
+ * This has currently 1 setting, the feature to collapse together footnotes
+ * with identical content is an option.
+ */
+function _footnotes_settings($format) {
+  $form['footnotes'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Footnotes'),
+    '#collapsible' => TRUE,
+  );
+  $form['footnotes']['footnotes_collapse_' . $format] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Collapse footnotes with same content'),
+    '#default_value' => variable_get('footnotes_collapse_' . $format, 0),
+    '#description' => t('If two footnotes have the exact same content, they will be collapsed into one as if using the same value="" attribute.'),
+  );
+  return $form;
+}
+
 /**
  * Implementation of hook_filter().
  *
@@ -106,6 +128,9 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
         case 'prepare':
           return $text;
 
+        case 'settings':
+          return _footnotes_settings($format);
+
         // The actual filtering is performed here. The supplied text should be
         // returned, once any necessary substitutions have taken place.
         case 'process':
@@ -132,6 +157,9 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
           elseif( $open_tags > $close_tags + 1) {
             trigger_error(t("You have unclosed fn tags. This is invalid and will produce unpredictable results."));
           }
+
+          // Before doing the replacement, the callback function needs to know which options to use.
+          _footnotes_replace_callback(variable_get('footnotes_collapse_' . $format, 0), 'prepare');
 
           $pattern = '|<fn([^>]*)>(.*?)</fn>|s';
           $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
@@ -209,16 +237,52 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
 
 
 /**
+ * Search the $store_matches array for footnote text that matches and return the value.
+ *
+ * Note: This does a linear search on the $store_matches array. For a large list of 
+ * footnotes it would be more efficient to maintain a separate array with the footnote
+ * content as key, in order to do a hash lookup at this stage. Since you typically
+ * only have a handful of footnotes, this simple search is assumed to be more efficient.
+ * (but was not tested).
+ *
+ * @author djdevin (see http://drupal.org/node/808214)
+ * 
+ * @param string The footnote text
+ * @param array The matches array
+ *
+ * @return mixed The value of the existing footnote, FALSE otherwise
+ */
+function _footnotes_helper_find_footnote($text, &$store_matches) {
+  if (!empty($store_matches)) {
+    foreach ($store_matches as &$fn) {
+      if ($fn['text'] == $text) {
+        return $fn['value'];
+      }
+    }
+  }  
+  return FALSE;
+}
+ 
+
+/**
  * Helper function called from preg_replace_callback() above
  *
  * Uses static vars to temporarily store footnotes found.
  * In my understanding, this is not threadsafe?!
  */
 function _footnotes_replace_callback( $matches, $op = '' ) {
+  static $opt_collapse = 0;
   static $n = 0;
   static $store_matches = array();
   static $used_values = array();
   $str = '';
+
+  if ($op == 'prepare') {
+    // In the 'prepare' case, the first argument contains the options to use.
+    // The name 'matches' is incorrect, we just use the variable anyway.
+    $opt_collapse = $matches;    
+    return 0;
+  }
 
   if( $op == 'output footer' ) {
     if (count($store_matches) > 0) {
@@ -260,6 +324,9 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
     if ( is_numeric($value) && $n < $value ) {
       $n = $value;
     }
+  } elseif ($opt_collapse and $value_existing = _footnotes_helper_find_footnote($matches[2],$store_matches)) {
+    // An identical footnote already exists. Set value to the previously existing value.
+    $value = $value_existing;
   } else {
     // No value label, either a plain <fn> or unparsable attributes. Increment the
     // footnote counter, set label equal to it.
