@@ -97,6 +97,10 @@ Also see section about HTML filter below.
 
 <h3>TIPS n TRICKS (CSS)</h3>
 
+Many Footnotes users don't want the footnotes to show in teasers (such as the front 
+page listing). The correct way to prevent that is by using CSS. See
+http://drupal.org/node/209037 for examples.
+
 Beginning with version 2.4, Footnotes will highlight the footnote text if you click
 on the footnote reference link. (This was inspired by wikipedia, see 
 http://drupal.org/node/728658). The highlight color is light gray. If this clashes
