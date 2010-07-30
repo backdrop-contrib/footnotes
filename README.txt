@@ -3,7 +3,8 @@
 
 Footnotes module can be used to easily create automatically numbered footnote 
 references into an article or post (such as a reference to a URL). It now 
-supports also TinyMCE.
+supports also TinyMCE. This release also includes "Better URL filter", which can 
+be used to replace the (incomplete) URL filter available in Drupal core. 
 
 Beginning with version 2.4, Footnotes will highlight the footnote text if you click
 on the footnote reference link. (This was inspired by wikipedia, see 
@@ -23,16 +24,17 @@ you have used these in your own themes, please change your CSS accordingly:
 Due to changes in HTML and CSS, <strong>you need to clear the Drupal cache</strong>
 after upgrading to version 2.4 or later.
 
+Version 2.4 introduces an optional feature that identical footnotes are collapsed
+into one, as if they had the same value="" attribute. This must be enabled from
+admin/settings/filters by choosing the relevant "Input format" and then the 
+"Configure" tab. By default, footnotes are separate unless you specify them to
+have the same value="" attribute.
+
 The erroneously named "footnotes-aternative_layout.css" file had been kept for
 backward compatibility but is now removed in 2.4. The correct file is 
 "footnotes-alternative_layout.css". This file was updated to reflect changes in
 the default css file.
 
-This release also includes "Better URL filter", which can be used to replace the 
-(incomplete) URL filter available in Drupal core. Especially Footnotes users have 
-suffered from the current URL filter, so the inclusion of a fixed URL filter in 
-Footnotes provides for much awaited relief to Footnotes users. Even so, it is 
-also possible to use Better URL filter independent of the Footnotes filter.
 
 <h3>ABOUT FOOTNOTES</h3>
 
