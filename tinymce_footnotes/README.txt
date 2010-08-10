@@ -1,5 +1,15 @@
-TinyMCE Footnotes 6.x-0.1
+DEPRECATED: TinyMCE Footnotes 6.x-0.1
 --------------------
+
+Note: This module is DEPRECATED. Please use footnotes_wysiwyg module instead 
+(in the Footnotes package), it contains a newer version of this code.
+
+If you are not using this module, you can safely delete this folder.
+
+
+Installation
+--------------------
+
 Installation Instructions:
 1. place in your modules directory (i.e. /sites/all/modules)
 2. Enable the module in /admin/build/modules

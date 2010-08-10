@@ -1,5 +1,5 @@
 name = "TinyMCE Footnotes"
-description = "Quick custom module for Adding a footnote button to TinyMCE"
+description = "DEPRECATED: Please use 'Footnotes Wysiwyg' instead"
 package = User interface
 dependencies[] = wysiwyg
 dependencies[] = footnotes

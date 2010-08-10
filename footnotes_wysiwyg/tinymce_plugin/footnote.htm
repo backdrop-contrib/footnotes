@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <title>Add footnote</title>
+ <script type="text/javascript" src="tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="footnote.js"></script>
+ <style>
+  #fntext {
+    width: 350px;
+    height: 100px;
+  }
+  #fnvalue {
+    margin-bottom: 30px;
+  }
+ </style>
+</head>
+<body id="link">
+<form onsubmit="FootnoteDialog.update();return false;" action="#">
+  <h3>Enter Footnote Text:</h3>
+		<textarea id="fntext" name="fntext" class="mceFocus" cols="15" rows="10"></textarea>
+<!-- User feedback: simplicity is better than exposing all options
+  <p>Specify label value: (optional)</p>
+		<input type="text" id="fnvalue" name="fnvalue" />
+-->			
+
+        <div class="mceActionPanel">
+                <div style="float: left">
+                        <input type="submit" id="insert" name="insert" value="{#insert}" />
+                </div>
+
+                <div style="float: right">
+                        <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+                </div>
+        </div>
+
+<!--
+	<div class="mceActionPanel">
+		<div style="float: left">
+			<input type="submit" id="insert" name="insert" value="insert" />
+		</div>
+
+		<div style="float: right">
+			<input type="button" id="cancel" name="cancel" value="cancel" onclick="tinyMCEPopup.close();" />
+		</div>
+	</div>
+ -->
+</form>
+</body>
+</html>

@@ -1,0 +1,6 @@
+name = "Footnotes Wysiwyg"
+description = "Add a footnote button to Wysiwyg editors (TinyMCE, CKEditor)"
+package = User interface
+dependencies[] = wysiwyg
+dependencies[] = footnotes
+core = 6.x
