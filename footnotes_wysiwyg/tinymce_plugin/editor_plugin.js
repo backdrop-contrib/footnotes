@@ -31,7 +31,7 @@
       // The first argument should match the <key> used in 
       // @plugins[<plugin name>]["buttons"][<key>] in hook_wysiwyg_plugin()
       ed.addButton('footnotes', { 
-        title : 'Add footnote',
+        title : Drupal.t('Add footnote'),
         cmd : 'Footnotes', // This should match the string in ed.addCommand above
         image : url + '/img/note_add.png'
       });

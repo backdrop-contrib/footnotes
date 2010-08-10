@@ -16,8 +16,17 @@
 </head>
 <body id="link">
 <form onsubmit="FootnoteDialog.update();return false;" action="#">
-  <h3>Enter Footnote Text:</h3>
+
+<script type="text/javascript">
+<!-- 
+  // This uses Drupal translation strings, NOT the TinyMCE facilities
+  // The Drupal object doesn't exist here, we have to fetch it from the opening browser 
+  // window, which is a Drupal generated page.
+  document.write('<h3>'+window.opener.Drupal.t('Enter footnote :')+'</h3>'); 
+-->
+</script>
 		<textarea id="fntext" name="fntext" class="mceFocus" cols="15" rows="10"></textarea>
+
 <!-- User feedback: simplicity is better than exposing all options
   <p>Specify label value: (optional)</p>
 		<input type="text" id="fnvalue" name="fnvalue" />
@@ -25,11 +34,19 @@
 
         <div class="mceActionPanel">
                 <div style="float: left">
-                        <input type="submit" id="insert" name="insert" value="{#insert}" />
+<script type="text/javascript">
+<!-- 
+  document.write('<input type="submit" id="insert" name="insert" value="'+window.opener.Drupal.t('Insert')+'" />'); 
+-->
+</script>
                 </div>
 
                 <div style="float: right">
-                        <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+<script type="text/javascript">
+<!-- 
+  document.write('<input type="button" id="cancel" name="cancel" value="'+window.opener.Drupal.t('Cancel')+'" onclick="tinyMCEPopup.close();" />'); 
+-->
+</script>
                 </div>
         </div>
 
