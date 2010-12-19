@@ -650,7 +650,7 @@ function _footnotes_filter_url_settings($format) {
  */
 function _footnotes_filter_url($text, $format) {
   // List of tags - the content of which must be skipped.
-  $ignoretags = 'a|script|style|code';
+  $ignoretags = 'a|script|style|code|textarea';
 
   // This filter identifies and makes clickable links of 3 types of "links".
   // 1) URL's like http://www.example.com.

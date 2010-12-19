@@ -1,3 +1,15 @@
+xxx-xx-xx Footnotes 2.5
+
+This is a bug fix release only.
+
+Smaller fixes
+
+ - Bug [#974760]
+   Add textarea to ignored tags. Anything inside a textarea will be ignored.
+
+
+The intention is to branch a Drupal 7 version out of this release.
+
 2010-10-03 Footnotes 2.4
 
 Major features
