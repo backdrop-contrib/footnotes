@@ -105,7 +105,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
     return array(
       0 => t('Footnotes [fn]...[/fn]'),
       1 => t('Footnotes Textile style'),
-      99 => t('Better URL filter (DEPRECATED, use Drupal 7 core)')
+      99 => t('Better URL filter')
     );
   }
 
@@ -217,7 +217,7 @@ function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
     case 99:
       switch ($op) {
         case 'description':
-          return t('Better URL filter: Turns web and e-mail addresses into clickable links. DEPRECATED: This code is in Drupal 7 core and will be removed from the Footnotes module in Drupal 7. <a href="http://drupal.org/node/161217">#161217</a>');
+          return t('Better URL filter: Turns web and e-mail addresses into clickable links. (Note: This code is now in Drupal 7 core and will be removed from the Footnotes module in Drupal 7. <a href="http://drupal.org/node/161217">#161217</a>)');
 
         // We don't need the "prepare" operation for this filter, but it's required
         // to at least return the input text as-is.
