@@ -159,14 +159,16 @@ this, please tell.) In addition IE 5.5 has a more serious bug that the footnote
 number will be on top of the first letters of the footnote text. There doesn't
 seem to be a way to fix this.
 
+The Views API functionality only works in the common use case when footnotes
+are at the end of the text, but does not work correctly when using [footnotes]
+tag explicitly. See [#1003690] to follow up on this bug.
+
 The development version of Drupal7 has a bug in that CSS and JavaScript files
 added by modules are absent from the page. If you are hit by this bug, your
 footnote references will not appear as supertext, and the list of footnotes will
 have duplicate numbering. There is a workaround to empty Drupal's cache table
-in 
-Administer > Site Configuration > Performance > Clear cached data
-after which everything works again. 
-To follow up on this bug, see [#279420]
+in Administer > Site Configuration > Performance > Clear cached data after which 
+everything works again. To follow up on this bug, see [#279420]
 
 <h3>COPYRIGHT AND ACKNOWLEDGEMENTS</h3>
 

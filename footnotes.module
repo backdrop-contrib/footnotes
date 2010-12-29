@@ -511,7 +511,7 @@ function theme_footnote_list($footnotes) {
     
 
   }
-  $str .= "</ul><!-- end footnotes -->\n";
+  $str .= "</ul>\n";
   return $str;
 }
 

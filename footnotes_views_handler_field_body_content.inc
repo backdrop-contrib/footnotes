@@ -14,12 +14,12 @@ class footnotes_views_handler_field_body_content extends footnotes_views_handler
   function render_name($data, $values) {
     $start = strpos($data, '<ul class="footnotes">');
     // By default footnotes are at the end, but they could be anywhere really.
-    $end   = strpos($data, '</ul><!-- end footnotes -->')+strlen('</ul><!-- end footnotes -->');
+    // $end   = strpos($data, '</ul><!-- end footnotes -->')+strlen('</ul><!-- end footnotes -->');
     if ($start !== FALSE) {
       $result = substr($data, 0, $start);
-      if ($end !== FALSE) {
-        $result .= substr($data, $end);
-      }
+      // if ($end !== FALSE) {
+      //   $result .= substr($data, $end);
+      // }
       $data = $result;
     }
     return $data;
