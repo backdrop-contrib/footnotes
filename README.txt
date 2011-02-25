@@ -1,4 +1,3 @@
-// $Id$
 
 
 Footnotes module can be used to easily create automatically numbered footnote 
