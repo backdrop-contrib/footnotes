@@ -4,16 +4,6 @@
  * @file
  * The Footnotes module is a filter that can be used to insert
  * automatically numbered footnotes into Drupal texts.
- *
- * Currently there are two filters. One is suitable for use primarily with html markup,
- * but can be used with any input format. The second filter outputs footnotes in 
- * Textile format. This means you should run this filter together and before the 
- * Textile filter.
- * Note: The Textile filter is no longer maintained.
- * 
- * The Better URL filter is a fork of the URL filter in Drupal core filter.module. The
- * original filter in core is too simple when parsing and does not make links in footnotes clickable
- * (in addition to many other bugs).
  */
 
 /**
@@ -28,44 +18,40 @@ function footnotes_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       // This description is shown in the listing at admin/modules.
-      return t('Insert automatically numbered footnotes into Drupal texts. (Also includes Better URL filter.)');
+      return t('Insert automatically numbered footnotes using <fn> or [fn] tags.');
   }
 }
 
 /**
- * Implementation of hook_filter_tips().
- *
- * This hook allows filters to provide help text to users during the content
- * editing process. Short tips are provided on the content editing screen, while
+ * Implementation of hook_filter_info().
+ */
+function footnotes_filter_info() {
+  $filters['filter_footnotes'] = array(
+    'title' => t('Footnotes'),
+    'description' => t('Insert automatically numbered footnotes using <fn> or [fn] tags.'),
+    'process callback' => '_footnotes_filter',
+    'settings callback' => '_footnotes_settings',
+    'default settings' => array(
+      'footnotes_collapse' => 0,
+    ), 
+    'tips callback' => '_footnotes_filter_tips',
+    'weight' => -12,
+  );
+  return $filters;
+}
+
+/**
+ * Short tips are provided on the content editing screen, while
  * long tips are provided on a separate linked page. Short tips are optional,
  * but long tips are highly recommended.
  */
-function footnotes_filter_tips($delta, $format, $long = FALSE) {
-
-  switch ($delta) {
-    case 0:
-      if ($long) {
-        return t('You can insert footnotes directly into texts with <code>[fn]This text becomes a footnote.[/fn]</code>. This will be replaced with a running number (the footnote reference) and the text within the [fn] tags will be moved to the bottom of the page (the footnote).');
-      }
-      else {
-        return t('Use [fn]...[/fn] (or &lt;fn&gt;...&lt;/fn&gt;) to insert automatically numbered footnotes.');
-      }
-      break;
-
-    case 1:
-      if ($long) {
-        return t('You can insert footnotes directly into texts with [# ...]. This will be replaced with a running number (the footnote reference) and the text within the [# ...] tags will be moved to the bottom of the page (the footnote). <em>This filter outputs footnotes in Textile format. You should use it together and before the Textile filter.</em>');
-      }
-      else {
-        return t('Use [# ...] to insert automatically numbered footnotes. Textile variant.');
-      }
-      break;
-
-    case 99:
-      return t('Web page addresses and e-mail addresses turn into links automatically. (Better URL filter.)');
-      break;
-
-  }
+function _footnotes_filter_tips($filter, $format, $long = FALSE) {
+    if ($long) {
+      return t('You can insert footnotes directly into texts with <code>[fn]This text becomes a footnote.[/fn]</code>. This will be replaced with a running number (the footnote reference) and the text within the [fn] tags will be moved to the bottom of the page (the footnote). See %link for additional usage options.', array('%link'=>'<a href="http://drupal.org/project/footnotes">' . t('Footnotes Readme page') . '</a>'));
+    }
+    else {
+      return t('Use [fn]...[/fn] (or &lt;fn&gt;...&lt;/fn&gt;) to insert automatically numbered footnotes.');
+    }
 }
 
 
@@ -75,163 +61,68 @@ function footnotes_filter_tips($delta, $format, $long = FALSE) {
  * This has currently 1 setting, the feature to collapse together footnotes
  * with identical content is an option.
  */
-function _footnotes_settings($format) {
-  $form['footnotes'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Footnotes'),
-    '#collapsible' => TRUE,
-  );
-  $form['footnotes']['footnotes_collapse_' . $format] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Collapse footnotes with same content'),
-    '#default_value' => variable_get('footnotes_collapse_' . $format, 0),
-    '#description' => t('If two footnotes have the exact same content, they will be collapsed into one as if using the same value="" attribute.'),
-  );
-  return $form;
+function _footnotes_settings($form, &$form_state, $filter, $format, $defaults, $filters) {
+  
+  $settings['footnotes_collapse'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Collapse footnotes with identical content'),
+      '#default_value' => isset($filter->settings['footnotes_collapse']) ? $filter->settings['footnotes_collapse'] : $defaults['footnotes_collapse'],
+      '#description' => t('If two footnotes have the exact same content, they will be collapsed into one as if using the same value="" attribute.')
+    );
+    return $settings;
+
 }
 
 /**
- * Implementation of hook_filter().
- *
- * The bulk of filtering work is done here. This hook is quite complicated, so
- * we'll discuss each operation it defines.
+ * The bulk of filtering work is done here.
  */
-function footnotes_filter($op, $delta = 0, $format = -1, $text = '') {
-  // The "list" operation provides the module an opportunity to declare both how
-  // many filters it defines and a human-readable name for each filter. Note that
-  // the returned name should be passed through t() for translation.
-  if ($op == 'list') {
-    return array(
-      0 => t('Footnotes [fn]...[/fn]'),
-      1 => t('Footnotes Textile style'),
-      99 => t('Better URL filter')
-    );
+function _footnotes_filter($text = '', $filter, $format) {
+  
+  // Supporting both [fn] and <fn> now. Thanks to fletchgqc http://drupal.org/node/268026
+  // Convert all square brackets to angle brackets. This way all further code just
+  // manipulates angle brackets. (Angle brackets are preferred here for the simple reason
+  // that square brackets are more tedious to use in regexps.)
+  $text = preg_replace( '|\[fn([^\]]*)\]|', '<fn$1>', $text);
+  $text = preg_replace( '|\[/fn\]|', '</fn>', $text);
+  $text = preg_replace( '|\[footnotes([^\]]*)\]|', '<footnotes$1>', $text);
+
+
+  // Check that there are an even number of open and closing tags.
+  // If there is one closing tag missing, append this to the end.
+  // If there is more disparity, throw a warning and continue.
+  // A closing tag may sometimes be missing when we are processing a teaser
+  // and it has been cut in the middle of the footnote. 
+  // See http://drupal.org/node/253326
+  $foo = array();
+  $open_tags = preg_match_all("|<fn([^>]*)>|", $text, $foo);
+  $close_tags = preg_match_all("|</fn>|", $text, $foo);
+
+  if ($open_tags == $close_tags + 1) {
+    $text = $text . '</fn>';
+  }
+  elseif ($open_tags > $close_tags + 1) {
+    trigger_error(t("You have unclosed fn tags. This is invalid and will produce unpredictable results."));
   }
 
-  // All operations besides "list" provide a $delta argument so we know which
-  // filter they refer to. We'll switch on that argument now so that we can
-  // discuss each filter in turn.
-  switch ($delta) {
+  // Before doing the replacement, the callback function needs to know which options to use.
+  _footnotes_replace_callback($filter->settings['footnotes_collapse'], 'prepare');
 
-    // First is the html footnotes filter
-    case 0:
+  $pattern = '|<fn([^>]*)>(.*?)</fn>|s';
+  $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
 
-      switch ($op) {
-        // This description is shown in the administrative interface, unlike the
-        // filter tips which are shown in the content editing interface.
-        case 'description':
-        return t('Use [fn]...[/fn] (or &lt;fn&gt;...&lt;/fn&gt;) to insert automatically numbered footnotes.');
-
-        // We don't need the "prepare" operation for this filter, but it's required
-        // to at least return the input text as-is.
-        case 'prepare':
-          return $text;
-
-        case 'settings':
-          return _footnotes_settings($format);
-
-        // The actual filtering is performed here. The supplied text should be
-        // returned, once any necessary substitutions have taken place.
-        case 'process':
-          // Supporting both [fn] and <fn> now. Thanks to fletchgqc http://drupal.org/node/268026
-          // Convert all square brackets to angle brackets. This way all further code just
-          // manipulates angle brackets. (Angle brackets are preferred here for the simple reason
-          // that square brackets are more tedious to use in regexps.)
-          $text = preg_replace( '|\[fn([^\]]*)\]|', '<fn$1>', $text);
-          $text = preg_replace( '|\[/fn\]|', '</fn>', $text);
-          $text = preg_replace( '|\[footnotes([^\]]*)\]|', '<footnotes$1>', $text);
-
-
-          // Check that there are an even number of open and closing tags.
-          // If there is one closing tag missing, append this to the end.
-          // If there is more disparity, throw a warning and continue.
-          // A closing tag may sometimes be missing when we are processing a teaser
-          // and it has been cut in the middle of the footnote. http://drupal.org/node/253326
-          $foo = array();
-          $open_tags = preg_match_all("|<fn([^>]*)>|", $text, $foo);
-          $close_tags = preg_match_all("|</fn>|", $text, $foo);
-          if($open_tags == $close_tags + 1) {
-            $text = $text . '</fn>';
-          }
-          elseif( $open_tags > $close_tags + 1) {
-            trigger_error(t("You have unclosed fn tags. This is invalid and will produce unpredictable results."));
-          }
-
-          // Before doing the replacement, the callback function needs to know which options to use.
-          _footnotes_replace_callback(variable_get('footnotes_collapse_' . $format, 0), 'prepare');
-
-          $pattern = '|<fn([^>]*)>(.*?)</fn>|s';
-          $text = preg_replace_callback($pattern , '_footnotes_replace_callback', $text);
-
-          // Replace tag <footnotes> with the list of footnotes.
-          // If tag is not present, by default add the footnotes at the end.
-          // Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 
-          $footer = '';
-          $footer = _footnotes_replace_callback(NULL, 'output footer');
-          $pattern = '|(<footnotes([^\]]*)>)|';
-          if(preg_match($pattern, $text) > 0) {
-            $text = preg_replace($pattern, $footer, $text, 1);
-            return $text;
-          }
-          else {
-            return $text . "\n\n" . $footer;
-          }
-      }
-      break;
-
-    // Textile version.
-    case 1:
-
-      switch ($op) {
-        // This description is shown in the administrative interface, unlike the
-        // filter tips which are shown in the content editing interface.
-        case 'description':
-          return t('Use [# ...] to insert automatically numbered footnotes in Textile markup.');
-
-        // We don't need the "prepare" operation for this filter, but it's required
-        // to at least return the input text as-is.
-        case 'prepare':
-          return $text;
-
-        // The actual filtering is performed here. The supplied text should be
-        // returned, once any necessary substitutions have taken place.
-        case 'process':
-          $text = preg_replace_callback('|\[# (.*?)\]|s', '_footnotes_replace_callback_textile', $text);
-
-          //Replace Textile tag "footnotes." with the list of footnotes.
-          //If tag is not present, by default add the footnotes at the end.
-          //Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 
-          $footer = '';
-          $footer = _footnotes_replace_callback_textile(NULL, 'output footer');
-          if( preg_match( '/\n *footnotes\. *(\n|$)/', $text ) > 0 ) {
-            $text = preg_replace('/\n *footnotes\. *(\n|$)/', "\n$footer\n", $text, 1);
-            return $text;
-          }
-          else {
-            return $text . "\n\n" . $footer;
-          }
-      }
-      break;
-
-    case 99:
-      switch ($op) {
-        case 'description':
-          return t('Better URL filter: Turns web and e-mail addresses into clickable links. (Note: This code is now in Drupal 7 core and will be removed from the Footnotes module in Drupal 7. <a href="http://drupal.org/node/161217">#161217</a>)');
-
-        // We don't need the "prepare" operation for this filter, but it's required
-        // to at least return the input text as-is.
-        case 'prepare':
-          return $text;
-
-        case 'process':
-          return _footnotes_filter_url($text, $format);
-
-        case 'settings':
-          return _footnotes_filter_url_settings($format);
-      }
-      break;
-
+  // Replace tag <footnotes> with the list of footnotes.
+  // If tag is not present, by default add the footnotes at the end.
+  // Thanks to acp on drupal.org for this idea. see http://drupal.org/node/87226 
+  $footer = '';
+  $footer = _footnotes_replace_callback(NULL, 'output footer');
+  $pattern = '|(<footnotes([^\]]*)>)|';
+  if (preg_match($pattern, $text) > 0) {
+    $text = preg_replace($pattern, $footer, $text, 1);
+    return $text;
   }
+  else {
+    return $text . "\n\n" . $footer;
+   }
 }
 
 
@@ -267,7 +158,7 @@ function _footnotes_helper_find_footnote($text, &$store_matches) {
  * Helper function called from preg_replace_callback() above
  *
  * Uses static vars to temporarily store footnotes found.
- * In my understanding, this is not threadsafe?!
+ * This is not threadsafe, but PHP isn't.
  */
 function _footnotes_replace_callback( $matches, $op = '' ) {
   static $opt_collapse = 0;
@@ -287,7 +178,9 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
     if (count($store_matches) > 0) {
       // Only if there are stored fn matches, pass the array of fns to be themed
       // as a list
-      $str = theme('footnote_list',$store_matches);
+      // Drupal 7 requires we use "render element" which just introduces a wrapper
+      // around the old array.
+      $str = theme('footnote_list',array('footnotes' => $store_matches));
     }
     // Reset the static variables so they can be used again next time
     $n = 0;
@@ -385,37 +278,10 @@ function _footnotes_replace_callback( $matches, $op = '' ) {
   }
 
   // Return the item themed into a footnote link.
+  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // around the old array.
+  $fn = array('fn' => $fn );
   return theme('footnote_link',$fn);
-}
-
-
-/**
- * Helper function called from preg_replace_callback() above
- *
- * Uses static vars to temporarily store footnotes found.
- * In my understanding, this is not threadsafe?!
- */
-function _footnotes_replace_callback_textile( $matches, $op = '' ) {
-  static $n = 0;
-  static $store_matches = array();
-  $str = '';
-  
-  if( $op == 'output footer' ) {
-    if( $n > 0 ) {
-      $str = '';
-      for( $m = 1; $m <= $n; $m++ ){
-        $str .= "fn$m. " . $store_matches[ $m - 1 ] . "\n\n";
-      }
-    }
-    $n = 0;
-    $store_matches = array();
-    return $str;
-  }
-
-  //default op: act as called by preg_replace_callback()
-  array_push( $store_matches, $matches[1] );
-  $n++;
-  return '[' . $n . ']';  
 }
 
 /**
@@ -440,13 +306,13 @@ function _footnotes_helper_randstr() {
  *
  * Thanks to emfabric for this implementation. http://drupal.org/node/221156
  */
-function footnotes_theme( ) {
+function footnotes_theme() {
   return array(
     'footnote_link' => array(
-      'arguments' => array('fn' => NULL)
+      'render element' => 'fn' 
     ),
     'footnote_list' => array(
-      'arguments' => array('footnotes' => NULL)
+      'render element' => 'footnotes'
     )
   );
 }
@@ -464,6 +330,9 @@ function footnotes_theme( ) {
  *            footnote listing, used to allow links to the list from the body
  */
 function theme_footnote_link($fn) {
+  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // around the old array.
+  $fn = $fn['fn'];
   return '<a class="see-footnote" id="' . $fn['ref_id'] . 
          '" title="' . $fn['text_clean'] . '" href="#' . $fn['fn_id'] . '">' .
          $fn['value'] . '</a>';
@@ -484,36 +353,33 @@ function theme_footnote_link($fn) {
  */
 function theme_footnote_list($footnotes) {
   $str = '<ul class="footnotes">';
+  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // around the old array.
+  $footnotes = $footnotes['footnotes'];
   // loop through the footnotes
   foreach ($footnotes as $fn) {
-    if( ! is_array( $fn['ref_id'] ) )
-    {
+    if(!is_array( $fn['ref_id'])) {
       // Output normal footnote
       $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><a class="footnote-label" href="#' . $fn['ref_id'] . '">' . $fn['value'] . '.</a> ';
       $str .= $fn['text'] . "</li>\n";
     }
-    else
-    {
+    else {
       // Output footnote that has more than one reference to it in the body.
       // The only difference is to insert backlinks to all references.
       // Helper: we need to enumerate a, b, c...
       $abc = str_split("abcdefghijklmnopqrstuvwxyz"); $i = 0;
 
-      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><span class="footnote-label">' . $fn['value'] . '.</span> ';
-      foreach ( $fn['ref_id'] as $ref ) 
-      {
+      $str .= '<li class="footnote" id="' . $fn['fn_id'] .'"><a href="#' . $fn['ref_id'][0] . '" class="footnote-label">' . $fn['value'] . '.</a> ';
+      foreach ($fn['ref_id'] as $ref) {
         $str .= '<a class="footnote-multi" href="#' . $ref . '">' . $abc[$i] . '.</a> ';
         $i++;
       }
       $str .= $fn['text'] . "</li>\n";   
     }
-    
-
   }
   $str .= "</ul>\n";
   return $str;
 }
-
 
 /**
 * Implementation of hook_init()
@@ -524,15 +390,18 @@ function theme_footnote_list($footnotes) {
 * for the question leading up to it. http://drupal.org/node/80538
 */
 function footnotes_init() {
-  drupal_add_css(drupal_get_path('module', 'footnotes') .'/footnotes.css');
+  drupal_add_css(drupal_get_path('module', 'footnotes') . '/footnotes.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
 }
 
 /**
 * Helper for other filters, check if Footnotes is present in your filter chain.
 *
+* Note: Due to changes in Filter API, the arguments to this function have changed
+* in Drupal 7.
+* 
 * Other filters may leverage the Footnotes functionality in a simple way:
 * by outputting markup with <fn>...</fn> tags within. 
-
+*
 * This creates a dependency, the Footnotes filter must be present later in 
 * "Input format". By calling this helper function the other filters that 
 * depend on Footnotes may check whether Footnotes is present later in the chain
@@ -541,255 +410,30 @@ function footnotes_init() {
 * If this function returns true, the caller may depend on Footnotes. Function returns
 * false if caller may not depend on Footnotes.
 * 
+* You should also put "dependencies = footnotes" in your module.info file.
+*
 * Example usage:
 * <code>
-* filter_example_filter( $op, $delta = 0, $format = -1, $text = '') {
+* _filter_example_process( $text, $filter, $format ) {
 *   ...
-*   //When caller wishes to depend on html footnotes, last argument may be omitted
-*   if( footnotes_is_footnotes_later( $format, 'filter_example_filter', $delta ) ) {
-*     //output markup which may include <fn> tags
+*   if(footnotes_is_footnotes_later($format, $filter)) {
+*     //output markup which may include [fn] tags
 *   }
 *   else {
 *     // must make do without footnotes features
+*     // can also emit warning/error that user should install and configure footnotes module
 *   }
 *   ...
 * }
 * </code>
 *
-* Note: You should also put "dependencies = footnotes" in your module.info file.
-*
 * @param $format
-*    The input format caller is being run as part of ($format of hook_filter(...))
-* @param $caller
-*    Name of calling module
-* @param $caller_delta
-*    Delta of the filter within calling module ($delta of hook_filter(...))
-* @param $footnotes_delta
-*    Delta of the filter within footnotes module
+*    The text format object caller is part of.
+* @param $caller_filter
+*    The filter object representing the caller (in this text format).
 *
-* @return True if Footnotes is present after $caller in Input format $format
+* @return True if Footnotes is present after $caller in $format.
 */
-function footnotes_is_footnotes_later( $format, $caller, $caller_delta=0, $footnotes_delta=0) {
-    //Determine caller's weight in the current input format
-    $result = 
-       db_query( "SELECT weight FROM filters WHERE module='%s' AND format=%d AND delta=%d;",
-                        $caller, $format, $caller_delta );
-    $caller_weight = db_fetch_object( $result );
-    $caller_weight = $caller_weight->weight;
-
-    //See if Footnotes is present in the input format and if weight is higher
-    $result = 
-       db_query( "SELECT weight FROM filters WHERE module='%s' AND format=%d AND delta=%d;",
-                        'footnotes', $format, $footnotes_delta );
-    $fn_weight = db_fetch_object( $result );
-    if( $fn_weight ) {
-      $fn_weight = $fn_weight->weight;
-    }
-    else {
-      //Footnotes is not present at all in input format $format
-      return FALSE;
-    }
-    
-    if( $fn_weight > $caller_weight ) {
-      //Footnotes is after caller in input format $format
-      return TRUE;
-    }
-    else {
-      //Footnotes is before caller in input format $format
-      return FALSE;
-      //TODO: What is correct interpretation when weight is equal?
-    }
+function footnotes_is_footnotes_later( $format, $caller_filter) {
+    return $format['filter_footnotes']['weight'] > $caller_filter['weight'];
 }
-
-
-
-
-
-
-/**********************************************************************************************************
- * The URL filter shipped in Drupal core filter.module is buggy (or rather, too simple). Footnotes users
- * in particular are affected since URL's in footnotes don't get converted into links even if they should.
- *
- * I've submitted a patch for a better URL filter a year ago, but the core developers have not committed it.
- * There are no bugs or anything, just that nobody is paying attention.
- * http://drupal.org/node/161217
- *
- * To end the misery, I'm publishing the good version of URL filter within the Footnotes module. The URL 
- * filter related code is below, plus a few snippets above in footnotes_filter and footnotes_filter_tips.
- *
- * This forked "Better URL filter" will be deprecated if the code is ever committed to Drupal core.
- **********************************************************************************************************
- */
-
-
-
-
-/**
- * Settings for URL filter.
- */
-function _footnotes_filter_url_settings($format) {
-  $form['footnotes_filter_urlfilter'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Better URL filter'),
-    '#collapsible' => TRUE,
-  );
-  $form['footnotes_filter_urlfilter']['footnotes_filter_url_length_' . $format] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum link text length'),
-    '#default_value' => variable_get('footnotes_filter_url_length_' . $format, 72),
-    '#maxlength' => 4,
-    '#description' => t('URLs longer than this number of characters will be truncated to prevent long strings that break formatting. The link itself will be retained; just the text portion of the link will be truncated.'),
-  );
-  return $form;
-}
-
-/**
- * URL filter. Automatically converts text web addresses (URLs, e-mail addresses,
- * ftp links, etc.) into hyperlinks.
- */
-function _footnotes_filter_url($text, $format) {
-  // List of tags - the content of which must be skipped.
-  $ignoretags = 'a|script|style|code|textarea';
-
-  // This filter identifies and makes clickable links of 3 types of "links".
-  // 1) URL's like http://www.example.com.
-  // 2) e-mail addresses like name@example.com.
-  // 3) Web addresses without the "http://" protocol defined, like www.example.com.
-  // Each type must be processed separately, as there is no one regular expression
-  // that could possibly match all of the cases in one pass.
-  //
-  // Create an array which contains the regexps for each type of link.
-  // The key to the regexp is the name of a function that is used as
-  // callback function to process matches of the regexp. The callback function
-  // is to return the replacement for the match.
-  // The array is used and matching/replacement done below inside some loops.
-  $tasks = NULL;
-  // Match absolute URLs.
-  $protocols = 'http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://';
-  $urlpattern = "(?:$protocols)(?:[a-zA-Z0-9@:%_+*~#?&=.,/;-]*[a-zA-Z0-9@:%_+*~#&=/;-])";
-  $re = "`($urlpattern)([\.\,\?\!]*?)`i";
-  $tasks['_footnotes_filter_url_parse_full_links'] = $re;
-  // Match e-mail addresses.
-  // Note: The ICANN seems to be on track towards accepting more diverse top level domains,
-  // so this pattern has been "future-proofed" to allow for TLD's of length 2-64.
-  $urlpattern = '[A-Za-z0-9._-]+@[A-Za-z0-9._+-]+\.[A-Za-z]{2,64}';
-  $re = "`($urlpattern)`i";
-  $tasks['_footnotes_filter_url_parse_email_links'] = $re;
-  // Match www domains/addresses.
-  $urlpattern = 'www\.[a-zA-Z0-9@:%_+*~#?&=.,/;-]*[a-zA-Z0-9@:%_+~#\&=/;-]';
-  $re = "`($urlpattern)([\.\,\?\!]*?)`i";
-  $tasks['_footnotes_filter_url_parse_partial_links'] = $re;
-
-  // Pass length to regexp callback.
-  _footnotes_filter_url_trim(NULL, variable_get('footnotes_filter_url_length_' . $format, 72));
-
-  // We need to process each case of replacement type separately.
-  // The text must be joined and split again after each
-  // replacement, since replacements create new HTML tags and the new
-  // tags must be correctly protected before the next replacement can be done.
-  foreach ($tasks as $task => $re) {
-    // Split at all tags.
-    // This ensures that nothing that is a tagname or attribute or html comment will be processed.
-    $chunks = preg_split('/(<.+?>)/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-    // Note: PHP ensures the array consists of alternating delimiters and literals
-    // and begins and ends with a literal (inserting NULL as required).
-    // Therefore, first chunk is always text:
-    $chunk_type = 'text';
-    // Tags to ignore are defined in $ignoretags (see above).
-    // If an ignoretag is found, it is stored here and removed only when the
-    // closing tag is found. Until the closing tag is found, no replacements are made.
-    $opentag = '';
-
-    for ($i = 0; $i < count($chunks); $i++) {
-      if ($chunk_type == 'text') {
-        // Only do replacements when there are no unclosed ignoretags.
-        if ($opentag == '') {
-          // This is the high point of this function! If there is a match,
-          // a link is created in the callback function named by $task.
-          $chunks[$i] = preg_replace_callback($re, $task, $chunks[$i]);
-        }
-        // Done processing text chunk, so next chunk is a tag.
-        $chunk_type = 'tag';
-      }
-      else {
-        if ($opentag == '') {
-          // No open ignoretags. Process this tag...
-          if (preg_match("`<($ignoretags)(?:\s|>)`i", $chunks[$i], $matches)) {
-            // This matches one of the $ignoretags.
-            // Catch and store the tag in question.
-            $opentag = $matches[1];
-          }
-        }
-        else {
-          // There is an $ignoretag open. See if this is a matching closing tag.
-          // Nothing else is done until we find the closing tag.
-          if (preg_match("`<\/$opentag>`i", $chunks[$i], $matches)) {
-            $opentag = '';
-          }
-        }
-        // Done processing tag chunk, so next chunk is text.
-        $chunk_type = 'text';
-      }
-    }
-  $text = implode($chunks);
-  }
-
-  return $text;
-}
-/**
- * Callback function. Make links out of absolute URLs.
- */
-function _footnotes_filter_url_parse_full_links($match) {
-  // The $i:th parenthesis in the regexp contains the URL.
-  $i = 1;
-
-  $match[$i] = decode_entities($match[$i]);
-  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
-  $match[$i] = check_url($match[$i]);
-  return '<a href="' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>' . $match[$i+1];
-}
-
-/**
- * Callback function. Make links out of e-mail addresses.
- */
-function _footnotes_filter_url_parse_email_links($match) {
-  // The $i:th parenthesis in the regexp contains the URL.
-  $i = 0;
-
-  $match[$i] = decode_entities($match[$i]);
-  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
-  $match[$i] = check_url($match[$i]);
-  return '<a href="mailto:' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>';
-}
-
-/**
- * Callback function. Make links out of domain names starting with "www.".
- */
-function _footnotes_filter_url_parse_partial_links($match) {
-  // The $i:th parenthesis in the regexp contains the URL.
-  $i = 1;
-
-  $match[$i] = decode_entities($match[$i]);
-  $caption = check_plain(_footnotes_filter_url_trim($match[$i]));
-  $match[$i] = check_plain($match[$i]);
-  return '<a href="http://' . $match[$i] . '" title="' . $match[$i] . '">' . $caption . '</a>' . $match[$i+1];
-}
-
-/**
- * Shortens long URLs to http://www.example.com/long/url...
- */
-function _footnotes_filter_url_trim($text, $length = NULL) {
-  static $_length;
-  if ($length !== NULL) {
-    $_length = $length;
-  }
-
-  if (strlen($text) > $_length) {
-    $text = substr($text, 0, $_length) . '...';
-  }
-
-  return $text;
-}
-
-/**** End of Better URL filter code. Now returning to our normally scheduled Footnotes programming. *****/
-/********************************************************************************************************/
