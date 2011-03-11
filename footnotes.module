@@ -35,7 +35,7 @@ function footnotes_filter_info() {
       'footnotes_collapse' => 0,
     ), 
     'tips callback' => '_footnotes_filter_tips',
-    'weight' => -12,
+    'weight' => -20,
   );
   return $filters;
 }
