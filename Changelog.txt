@@ -1,4 +1,8 @@
-xxx-xx-xx Footnotes 2.5
+2010-03-xx Footnotes 7.x-2.5
+
+ - First Drupal 7 release. No major feature changes over 6.x-2.5.
+
+2010-12-31 Footnotes 2.5
 
 Major features
 

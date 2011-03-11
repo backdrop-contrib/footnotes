@@ -1,13 +1,6 @@
-
-
 Footnotes module can be used to easily create automatically numbered footnote 
 references into an article or post (such as a reference to a URL). <strong>It
 now supports also TinyMCE and CKEditor via WYSIWYG module</strong>.
-
-This release also includes "Better URL filter", which can be used to replace the
-(incomplete) URL filter available in Drupal 6.x. The code from Better URL filter
-was committed into Drupal 7.x, so it will not appear as a separate module in the
-Footnotes 7.x-2.x series.
 
 <h3>ABOUT FOOTNOTES</h3>
 
@@ -20,43 +13,23 @@ anywhere you want.
 
 The filter will take the text within the tag and move it to a footnote at the
 bottom of the page. In it's place it will place a number which is also a link to
-the footnote. As of version 2.0 Footnotes supports both <code>[fn]square
-brackets[/fn]</code> and <code><fn>angle brackets</fn></code>. 
+the footnote. Footnotes supports both <code>[fn]square brackets[/fn]</code> 
+and <code><fn>angle brackets</fn></code>. 
 
-Also supported in 2.0 is the use of a "value" attribute to a) set the numbering
-to use as a label or b) to set an arbitrary text string as label. Ex:
-<code> [fn value="5"]This becomes footnote #5. Subsequent are #6, #7...[/fn]
+You can also use a "value" attribute to a) set the numbering to start from the
+given value, or b) to set an arbitrary text string as label. 
+Ex: <code> [fn value="5"]This becomes footnote #5. Subsequent are #6, #7...[/fn]
  [fn value="*"]This footnote is assigned the label "*"[/fn]</code>
 
-As of version 2.2 you can have multiple references to the same footnote in the
-text body.
+Using value="" you can have multiple references to the same footnote in the text 
+body.
 <code> [fn value="5"]This becomes footnote #5.[/fn]
  [fn value="5"]This is a reference to the same footnote #5, this text itself is
 discarded.[/fn]</code>
 
-Footnotes 2.4 supports both TinyMCE and CKEditor via plugins to the WYSIWYG
+Since 2.4 Footnotes supports both TinyMCE and CKEditor via plugins to the WYSIWYG
 module. They each work slightly differently, please see the README for those
 plugins to learn more.
-
-<h3>If you are upgrading from 2.3 or earlier</h3>
-
-Beginning with version 2.4, Footnotes will highlight the footnote text if you
-click on the footnote reference link. (This was inspired by wikipedia, see
-[#728658]). The highlight color is light gray. If this clashes with your site's
-colors, or you just want to set a nicer color (or unset the feature altogether)
-you need to override the default color in your own theme. (See below).
-
-As part of this feature, CSS class names have moved tags. While unlikely, if you
-have used these in your own themes, please change your CSS accordingly:
-<ul>
-<li>The "footnote" class used to be the A or SPAN element that is the footnote
-number/label in the list of footnotes. This class is now the LI element
-containing the entire footnote.</li>
-<li>The A or SPAN element now has the class "footnote_label"</li>
-</ul>
-
-Due to changes in HTML and CSS, <strong>you need to clear the Drupal
-cache</strong> after upgrading to version 2.4 or later.
 
 Version 2.4 introduces an optional feature that identical footnotes are
 collapsed into one, as if they had the same value="" attribute. This must be
@@ -64,43 +37,22 @@ enabled from admin/settings/filters by choosing the relevant "Input format" and
 then the "Configure" tab. By default, footnotes are separate unless you specify
 them to have the same value="" attribute.
 
-The erroneously named "footnotes-aternative_layout.css" file had been kept for
-backward compatibility but is now removed in 2.4. The correct file is
-"footnotes-alternative_layout.css". This file was updated to reflect changes in
-the default css file.
-
 <h3>BETTER URL FILTER</h3>
 
-This version of Footnotes includes also a "Better URL filter". This is a fork of
-the URL filter in Drupal core filter.module. The original URL filter is buggy
-and works particularly badly together with Footnotes.
-
-<strong>Note: The code from Better URL filter has now been committed to
-Drupal 7 core. It will remain in the 6.x-* series of Footnotes, but will
-disappear from the 7.x-* series.</strong>
-
-In particular Footnotes users have suffered from the Drupal URL filter not
-converting URL's inside footnotes to links, however, the Better URL filter can
-be used by anyone wishing more correct URL filter functionality, even if you
-don't use footnotes. (You don't even need to enable the Footnotes filters to use
-the Better URL filter.)
-
+The Footnotes module also used to ship a "Better URL filter". This code has
+now been committed to Drupal core and you can use it from there as the
+regular URL filter. Better URL filter has been removed from the 7.x-2.x
+version of footnotes.
 
 <h3>INSTALL INSTRUCTIONS FOR FOOTNOTES.MODULE</h3>
 
-1. Copy the contents of this module to modules/footnotes folder.
+1. Copy the contents of this module to sites/all/modules/footnotes folder.
 2. Login as site administrator.
 3. Activate footnotes on the administer->modules page.
-4. To use the footnotes filter in some input formats, go to administer->input
-formats.
-5. For selected input formats, select configure and activate a suitable
-footnotes filter. 
-
-Note: Typically you want the footnotes filter to be pretty early in the chain. 
-If you need to lift the Footnotes filter higher up, click "rearrange".
-
-Also see section about HTML filter below.
-
+4. To use the footnotes filter in some input formats, go to Configuration ->
+   Text formats.
+5. For the Text formats you want to support footnotes markup, select configure 
+   and activate a suitable footnotes filter. 
 
 <h3>TIPS n TRICKS (CSS)</h3>
 
@@ -126,15 +78,17 @@ light red. */
 }
 </code>
 
-<h3>TEXTILE STYLE FOOTNOTES</h3>
+As part of this feature, CSS class names have moved tags. While unlikely, if you
+have used these in your own themes, please change your CSS accordingly:
+<ul>
+<li>The "footnote" class used to be the A or SPAN element that is the footnote
+number/label in the list of footnotes. This class is now the LI element
+containing the entire footnote.</li>
+<li>The A or SPAN element now has the class "footnote_label"</li>
+</ul>
 
-There is also another filter which does the same with a Textile markup style.
-Use it together with the Textile module.
-
-Note: The Textile style filter is no longer actively developed and may become
-deprecated. It is better to use the <code><fn>...</fn> or [fn]...[/fn]</code>
-style footnotes with any markup you are using.
-
+Due to changes in HTML and CSS, <strong>you need to clear the Drupal
+cache</strong> after upgrading to version 2.4 or later.
 
 
 <h3>HTML FILTER</h3>
@@ -162,12 +116,6 @@ The Views API functionality only works in the common use case when footnotes
 are at the end of the text, but does not work correctly when using [footnotes]
 tag explicitly. See [#1003690] to follow up on this bug.
 
-The development version of Drupal7 has a bug in that CSS and JavaScript files
-added by modules are absent from the page. If you are hit by this bug, your
-footnote references will not appear as supertext, and the list of footnotes will
-have duplicate numbering. There is a workaround to empty Drupal's cache table
-in Administer > Site Configuration > Performance > Clear cached data after which 
-everything works again. To follow up on this bug, see [#279420]
 
 <h3>COPYRIGHT AND ACKNOWLEDGEMENTS</h3>
 
