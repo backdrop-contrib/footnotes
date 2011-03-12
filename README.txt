@@ -37,6 +37,11 @@ enabled from admin/settings/filters by choosing the relevant "Input format" and
 then the "Configure" tab. By default, footnotes are separate unless you specify
 them to have the same value="" attribute.
 
+<h3>TEXTILE FILTER</h3>
+
+The Textile variant of Footnotes is now removed in 7.x-2.5. You can use the 
+standard [fn]...[/fn] filter also together with Textile notation.
+
 <h3>BETTER URL FILTER</h3>
 
 The Footnotes module also used to ship a "Better URL filter". This code has
@@ -115,6 +120,9 @@ seem to be a way to fix this.
 The Views API functionality only works in the common use case when footnotes
 are at the end of the text, but does not work correctly when using [footnotes]
 tag explicitly. See [#1003690] to follow up on this bug.
+
+The Views module is not yet ported to Drupal 7 and consequently also Footnotes
+Views cannot be ported.
 
 
 <h3>COPYRIGHT AND ACKNOWLEDGEMENTS</h3>
