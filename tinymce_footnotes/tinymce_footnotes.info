@@ -1,6 +1,0 @@
-name = "TinyMCE Footnotes"
-description = "DEPRECATED: Please use 'Footnotes Wysiwyg' instead"
-package = User interface
-dependencies[] = wysiwyg
-dependencies[] = footnotes
-core = 6.x
