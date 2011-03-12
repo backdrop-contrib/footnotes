@@ -18,7 +18,7 @@ function footnotes_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       // This description is shown in the listing at admin/modules.
-      return t('Insert automatically numbered footnotes using <fn> or [fn] tags.');
+      return t('Insert automatically numbered footnotes using &lt;fn&gt; or [fn] tags.');
   }
 }
 
@@ -28,7 +28,7 @@ function footnotes_help($section) {
 function footnotes_filter_info() {
   $filters['filter_footnotes'] = array(
     'title' => t('Footnotes'),
-    'description' => t('Insert automatically numbered footnotes using <fn> or [fn] tags.'),
+    'description' => t('Insert automatically numbered footnotes using &lt;fn&gt; or [fn] tags.'),
     'process callback' => '_footnotes_filter',
     'settings callback' => '_footnotes_settings',
     'default settings' => array(

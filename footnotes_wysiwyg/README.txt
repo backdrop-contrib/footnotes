@@ -1,7 +1,7 @@
-Footnotes Wysiwyg 6.x-0.1
+Footnotes Wysiwyg
 --------------------
 Installation Instructions:
-1. Enable the module in /admin/build/modules
+1. Enable the module in /admin/modules
 2. Enable the "Add Footnote" button in the Wysiwyg settings for the input format(s)
 that you would like to use.
 
