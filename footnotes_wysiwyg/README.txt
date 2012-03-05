@@ -1,9 +1,10 @@
 Footnotes Wysiwyg
 --------------------
 Installation Instructions:
-1. Enable the module in /admin/modules
-2. Enable the "Add Footnote" button in the Wysiwyg settings for the input format(s)
-that you would like to use.
+1. Make sure you have enabled wither the WYSIWYG or CKEditor module. Otherwise
+nothing will happen.
+2. Enable the module in /admin/modules
+3. Enable the "Add Footnote" button in the WYSIWYG or CKEditor module settings.
 
 TinyMCE
 ----------------------
