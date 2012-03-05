@@ -6,6 +6,10 @@ nothing will happen.
 2. Enable the module in /admin/modules
 3. Enable the "Add Footnote" button in the WYSIWYG or CKEditor module settings.
 
+Note: If you are using the CKEditor module, in addition to adding the button
+you must also check the 'Add Footnotes' checkbox for the 'Plugins' setting.
+
+
 TinyMCE
 ----------------------
 The TinyMCE plugin provides a simple dialog to enter footnote text that will be 
@@ -63,3 +67,4 @@ menu. Also, if one then clicks on the "Add footnote" toolbar button, the values
 of the existing footnote are not shown in the dialog box, rather a new, empty
 footnote dialog is shown. If "Ok" is clicked, the old footnote is lost and
 replaced with the empty or new values.
+
