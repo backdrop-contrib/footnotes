@@ -377,18 +377,6 @@ function theme_footnote_list($footnotes) {
 }
 
 /**
-* Implementation of hook_init()
-*
-* Add special css for Footnotes module.
-*
-* Thanks to binford2k@lug.wsu.edu for this tip and drinkypoo
-* for the question leading up to it. http://drupal.org/node/80538
-*/
-function footnotes_init() {
-  drupal_add_css(drupal_get_path('module', 'footnotes') . '/footnotes.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
-}
-
-/**
 * Helper for other filters, check if Footnotes is present in your filter chain.
 *
 * Note: Due to changes in Filter API, the arguments to this function have changed
