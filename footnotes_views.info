@@ -1,6 +1,5 @@
-name = Footnotes with Views 
+name = Footnotes with Views
 description = Add views support to the footnotes module by allowing you to cut the footnotes from the rest of the body (or teaser).
 dependencies[] = footnotes
 dependencies[] = views
 package = Other
-core = 6.x
