@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_views_handlers().
+ * Implements hook_views_handlers().
  */
 function footnotes_views_views_handlers() {
   return array(
@@ -25,7 +25,7 @@ function footnotes_views_views_handlers() {
 }
 
 /**
- * Implementation of hook_views_data().
+ * Implements hook_views_data().
  */
 function footnotes_views_views_data() {
   $data = array();

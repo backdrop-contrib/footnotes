@@ -22,7 +22,7 @@ function footnotes_field_menu() {
   $items['admin/config/content/footnotes'] = array(
     'title' => 'Footnotes',
     'description' => 'Config page for footnotes fields/blocks',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('_footnotes_field_admin_form'),
     'access arguments' => array('administer footnotes fields'),
     'file' => 'includes/footnotes_field.admin.inc',
@@ -60,7 +60,7 @@ function footnotes_field_ds_fields_info($entity_type) {
         'title' => t('Footnotes (ds field)'),
         'field_type' => DS_FIELD_TYPE_FUNCTION,
         'ui_limit' => $ui_limit,
-        'file' => drupal_get_path('module', 'footnotes_field') . '/ds/ds_footnotes_ui_field.inc',
+        'file' => backdrop_get_path('module', 'footnotes_field') . '/ds/ds_footnotes_ui_field.inc',
         'function' => '_footnotes_field_render',
         'properties' => array(),
       );
@@ -97,13 +97,13 @@ function footnotes_field_block_view($delta = '') {
           '#attached' => array(
             'js' => array(
               array(
-                'data' => drupal_get_path('module', 'footnotes_field') . '/js/footnotes_field.js',
+                'data' => backdrop_get_path('module', 'footnotes_field') . '/js/footnotes_field.js',
                 'type' => 'file',
               ),
             ),
             'css' => array(
               array(
-                'data' => drupal_get_path('module', 'footnotes_field') . '/css/footnotes_field.css',
+                'data' => backdrop_get_path('module', 'footnotes_field') . '/css/footnotes_field.css',
                 'type' => 'file',
               ),
             ),
@@ -116,11 +116,21 @@ function footnotes_field_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_config_info().
+ */
+function footnotes_field_config_info() {
+  $prefixes['footnotes_field.settings'] = array(
+    'label' => t('Module name settings'),
+    'group' => t('Configuration'),
+  );
+}
+
+/**
  * Fetches settings form admin page.
  *
  * @return array
  *   The footnotes field settings.
  */
 function _footnotes_field_get_settings() {
-  return variable_get('footnotes_field_settings', array());
+  return config_get('footnotes_field.settings', 'footnotes_field_settings');
 }
