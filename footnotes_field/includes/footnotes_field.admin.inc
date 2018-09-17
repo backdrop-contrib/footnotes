@@ -67,16 +67,16 @@ function _footnotes_field_admin_form_submit($form, &$form_state) {
   }
   $expose_block = $form_state['values']['expose_block'];
 
-  variable_set('footnotes_field_settings',
+  config_set('footnotes_field.settings', 'footnotes_field_settings',
     array(
-      'content_types' => $content_types,
-      'expose_block' => $expose_block,
-    ));
+    'content_types' => $content_types,
+    'expose_block' => $expose_block,
+  ));
 
   if (module_exists('ds')) {
-    drupal_flush_all_caches();
+    backdrop_flush_all_caches();
   }
-  drupal_set_message(t('Your settings have been saved.'));
+  backdrop_set_message(t('Your settings have been saved.'));
 }
 
 /**

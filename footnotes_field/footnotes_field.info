@@ -1,5 +1,6 @@
 name = Footnotes field/block
 description = Exposes a Display Suite field or block with all footnotes used in a node.
-core = 7.x
+backdrop = 1.x
+type = module
 dependencies[] = footnotes
 configure = admin/config/content/footnotes

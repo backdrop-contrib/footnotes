@@ -8,7 +8,7 @@
  */
 
 /**
- * Implementation of hook_wysiwyg_plugin().
+ * Implements hook_wysiwyg_plugin().
  */
 function footnotes_wysiwyg_wysiwyg_plugin($editor, $version) {
   $plugin = array(
@@ -22,12 +22,12 @@ function footnotes_wysiwyg_wysiwyg_plugin($editor, $version) {
   switch ($editor) {
     case 'tinymce':
       $plugin['footnotes']['filename'] = 'editor_plugin.js';
-      $plugin['footnotes']['path'] = drupal_get_path('module', 'footnotes_wysiwyg') . '/tinymce_plugin/';
+      $plugin['footnotes']['path'] = backdrop_get_path('module', 'footnotes_wysiwyg') . '/tinymce_plugin/';
       $plugin['footnotes']['extended_valid_elements'] = array('fn');
       return $plugin;
     case 'ckeditor':
       // For CKEditor, path is the directory and the .js file must be called 'plugin.js'.
-      $plugin['footnotes']['path'] = drupal_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin/';
+      $plugin['footnotes']['path'] = backdrop_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin/';
       return $plugin;
   }
 }
@@ -42,7 +42,7 @@ function footnotes_wysiwyg_ckeditor_plugin() {
     'footnotes' => array(
       'name' => 'footnotes',
       'desc' => t('Add Footnotes'),
-      'path' => drupal_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin/',
+      'path' => backdrop_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin/',
       'buttons' => array(
         'footnotes' => array(
           'icon' => 'images/footnotes.png',

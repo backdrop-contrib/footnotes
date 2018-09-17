@@ -1,0 +1,31 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the footnotes_field module.
+ *
+ */
+
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function footnotes_field_update_last_removed() {
+  return;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function footnotes_field_update_1000() {
+  $config = config('footnotes_field.settings');
+  $config->set('footnotes_field_settings', update_variable_get('footnotes_field_settings', 'dynamic value in file /footnotes-2/footnotes_field/footnotes_field.module line 125'));
+  update_variable_del('footnotes_field_settings');
+}
+
+/**
+ * Implements hook_install().
+ */
+function footnotes_field_install() {
+  // Dynamically generated variable data was detected.
+  // /footnotes-2/footnotes_field/footnotes_field.module line 125
+}

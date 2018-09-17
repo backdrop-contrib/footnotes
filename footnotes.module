@@ -3,11 +3,11 @@
 /**
  * @file
  * The Footnotes module is a filter that can be used to insert
- * automatically numbered footnotes into Drupal texts.
+ * automatically numbered footnotes into Backdrop texts.
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function footnotes_help($path, $arg) {
   switch ($path) {
@@ -18,7 +18,7 @@ function footnotes_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_filter_info().
+ * Implements hook_filter_info().
  */
 function footnotes_filter_info() {
   $filters['filter_footnotes'] = array(
@@ -86,7 +86,7 @@ function _footnotes_filter($text = '', $filter, $format) {
   // If there is one closing tag missing, append this to the end.
   // If there is more disparity, throw a warning and continue.
   // A closing tag may sometimes be missing when we are processing a teaser
-  // and it has been cut in the middle of the footnote. 
+  // and it has been cut in the middle of the footnote.
   // See http://drupal.org/node/253326
   $foo = array();
   $open_tags = preg_match_all("|<fn([^>]*)>|", $text, $foo);
@@ -171,7 +171,7 @@ function _footnotes_replace_callback($matches, $op = '') {
     if (count($store_matches) > 0) {
       // Only if there are stored fn matches, pass the array of fns to be themed
       // as a list
-      // Drupal 7 requires we use "render element" which just introduces a wrapper
+      // Backdrop 7 requires we use "render element" which just introduces a wrapper
       // around the old array.
       $str = theme('footnote_list', array('footnotes' => $store_matches));
     }
@@ -264,7 +264,7 @@ function _footnotes_replace_callback($matches, $op = '') {
     $store_matches[$i]['ref_id'] = $ref_array;
   }
   // Return the item themed into a footnote link.
-  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // Backdrop 7 requires we use "render element" which just introduces a wrapper
   // around the old array.
   $fn = array('fn' => $fn);
   return theme('footnote_link', $fn);
@@ -287,7 +287,7 @@ function _footnotes_helper_randstr() {
 }
 
 /**
- * Implementation of hook_theme()
+ * Implements hook_theme().
  *
  * Thanks to emfabric for this implementation. http://drupal.org/node/221156
  */
@@ -315,7 +315,7 @@ function footnotes_theme() {
  * listing, used to allow links to the list from the body
  */
 function theme_footnote_link($fn) {
-  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // Backdrop 7 requires we use "render element" which just introduces a wrapper
   // around the old array.
   $fn = $fn['fn'];
   return '<a class="see-footnote" id="' . $fn['ref_id'] .
@@ -338,7 +338,7 @@ function theme_footnote_link($fn) {
  */
 function theme_footnote_list($footnotes) {
   $str = '<ul class="footnotes">';
-  // Drupal 7 requires we use "render element" which just introduces a wrapper
+  // Backdrop 7 requires we use "render element" which just introduces a wrapper
   // around the old array.
   $footnotes = $footnotes['footnotes'];
   // loop through the footnotes
@@ -372,7 +372,7 @@ function theme_footnote_list($footnotes) {
  * chain.
  *
  * Note: Due to changes in Filter API, the arguments to this function have
- * changed in Drupal 7.
+ * changed in Backdrop 7.
  *
  * Other filters may leverage the Footnotes functionality in a simple way:
  * by outputting markup with <fn>...</fn> tags within.
@@ -413,4 +413,15 @@ function theme_footnote_list($footnotes) {
  */
 function footnotes_is_footnotes_later($format, $caller_filter) {
   return $format['filter_footnotes']['weight'] > $caller_filter['weight'];
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function footnotes_autoload_info() {
+  return array(
+    'footnotes_views_handler_field' => 'footnotes_views_handler_field.inc',
+    'footnotes_views_handler_field_body_content' => 'footnotes_views_handler_field_body_content.inc',
+    'footnotes_views_handler_field_body_footnotes' => 'footnotes_views_handler_field_body_footnotes.inc',
+  );
 }

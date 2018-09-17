@@ -22,17 +22,17 @@ function _footnotes_field_render($field) {
     '#attached' => array(
       'js' => array(
         array(
-          'data' => drupal_get_path('module', 'footnotes_field') . '/js/footnotes_field.js',
+          'data' => backdrop_get_path('module', 'footnotes_field') . '/js/footnotes_field.js',
           'type' => 'file',
         ),
       ),
       'css' => array(
         array(
-          'data' => drupal_get_path('module', 'footnotes_field') . '/css/footnotes_field.css',
+          'data' => backdrop_get_path('module', 'footnotes_field') . '/css/footnotes_field.css',
           'type' => 'file',
         ),
       ),
     ),
   );
-  return drupal_render($render);
+  return backdrop_render($render);
 }
