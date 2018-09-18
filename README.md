@@ -15,9 +15,9 @@ Installation
 - In a text editor, where you want to add a footnote to your text, enclose the
 footnote text within an `fn` tag.
 
-- Example: This is some body text.`[fn]This is footnote text.[/fn]`
+- Example: This is some body text.`[fn]This is footnote text.[/fn]` More body text ...
 
-- The text within the tag will be replaced by a number with a link and moved
+- The text within the `fn` tag will be replaced by a number with a link and moved
   to a footnote at the bottom of the page.
 
 Documentation
