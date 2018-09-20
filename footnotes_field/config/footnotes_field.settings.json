@@ -1,4 +1,4 @@
 {
     "_config_name": "footnotes_field.settings",
-    "footnotes_field_settings": "dynamic value in file /footnotes-2/footnotes_field/footnotes_field.module line 125"
+    "expose_block": true
 }
