@@ -1,5 +1,6 @@
-name = Footnotes field/block
-description = Exposes a Display Suite field or block with all footnotes used in a node.
+name = Footnotes block
+description = Exposes a block with all footnotes used in a node.
+package = Footnotes
 backdrop = 1.x
 type = module
 dependencies[] = footnotes

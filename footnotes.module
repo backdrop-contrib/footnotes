@@ -6,16 +6,6 @@
  * automatically numbered footnotes into Backdrop texts.
  */
 
-/**
- * Implements hook_help().
- */
-function footnotes_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#footnotes':
-      // This description is shown in the listing at admin/modules.
-      return t('Insert automatically numbered footnotes using &lt;fn&gt; or [fn] tags. Enable the footnotes text filter <a href="@url">here</a>.', array('@url' => url('admin/config/content/formats')));
-  }
-}
 
 /**
  * Implements hook_filter_info().
