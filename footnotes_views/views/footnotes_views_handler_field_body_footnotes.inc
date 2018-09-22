@@ -5,7 +5,7 @@
  * Views handler for the body footnotes.
  */
 
-class footnotes_views_handler_field_body_footnotes extends footnotes_views_handler_field {
+class footnotes_views_handler_field_body_footnotes extends views_handler_field_entity {
 
   function init(&$view, $options) {
     parent::init($view, $options);
@@ -31,8 +31,11 @@ class footnotes_views_handler_field_body_footnotes extends footnotes_views_handl
    * Function render().
    */
   function render($values) {
-    $body = parent::render($values);
-    return $this->render_link($this->render_name($body, $values), $values);
+    $node = $this->get_value($values);
+
+    $node = node_view($node);
+    $body = render($node['body']);
+    return $this->render_name($body, $values);
   }
 
 }
