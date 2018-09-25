@@ -33,22 +33,101 @@ function footnotes_wysiwyg_wysiwyg_plugin($editor, $version) {
 }
 
 /**
- * Implements hook_ckeditor_plugin().
+ * Implements hook_ckeditor_plugins().
  *
  * Register the CKEditor plugin for the CKEditor module.
  */
-function footnotes_wysiwyg_ckeditor_plugin() {
+function footnotes_wysiwyg_ckeditor_plugins() {
+  $path = backdrop_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin';
   return array(
     'footnotes' => array(
       'name' => 'footnotes',
+      'file' => 'plugin.js',
       'desc' => t('Add Footnotes'),
-      'path' => backdrop_get_path('module', 'footnotes_wysiwyg') . '/ckeditor_plugin/',
+      'path' => $path,
       'buttons' => array(
         'footnotes' => array(
-          'icon' => 'images/footnotes.png',
+          'image' => $path . '/images/footnotes.png',
           'label' => 'Footnotes',
         ),
       ),
     ),
   );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function footnotes_wysiwyg_menu() {
+  $items['editor/dialog/footnotes/%filter_format'] = array(
+    'title' => 'Footnotes',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('footnotes_wysiwyg_footnote_editor_form', 3),
+    'access callback' => 'filter_dialog_access',
+    'access arguments' => array(3, 'footnotes'),
+    'theme callback' => 'ajax_base_page_theme',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Form callback: Display a form for inserting/editing a link or uploading a file.
+ */
+function footnotes_wysiwyg_footnote_editor_form($form, &$form_state, $format) {
+  $form_state['format'] = $format;
+  // Record the dialog selector that needs to be closed if present.
+  if (isset($form_state['input']['dialogOptions']['target'])) {
+    $form_state['storage']['dialog_selector'] = $form_state['input']['dialogOptions']['target'];
+  }
+
+  // Pull in any default values set by the editor.
+  $values = array();
+  if (isset($form_state['input']['editor_object'])) {
+    $values = $form_state['input']['editor_object'];
+  }
+
+  // Set the dialog title.
+  backdrop_set_title(t('Insert footnote'));
+
+  $form['footnote_text'] = array(
+    '#title' => t('Footnote text'),
+    '#type' => 'textfield',
+    '#default_value' => isset($values['footnote_text']) ? $values['footnote_text'] : '',
+  );
+  $form['footnote_value'] = array(
+    '#title' => t('Footnote value'),
+    '#type' => 'textfield',
+    '#default_value' => isset($values['footnote_value']) ? $values['footnote_value'] : '',
+  );
+
+  form_load_include($form_state, 'inc', 'filter', 'filter.pages');
+
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#ajax' => array(
+      'callback' => 'filter_format_editor_dialog_save',
+      'event' => 'click',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_ckeditor_settings_alter().
+ */
+function footnotes_filter_format_editor_form_submit($form, &$form_state) {
+  $form_state['values']['attributes']['footnote_text'] = $form_state['values']['footnote_text'];
+  $form_state['values']['attributes']['footnote_value'] = $form_state['values']['footnote_value'];
+}
+
+/**
+ * Implements hook_ckeditor_settings_alter().
+ */
+function footnotes_wysiwyg_ckeditor_settings_alter(&$settings, $format) {
+  $link_token = filter_editor_dialog_token($format, 'footnotes');
+  $settings['backdrop']['footnotesDialogUrl'] = url('editor/dialog/footnotes/' . $format->format, array('query' => array('token' => $link_token, 'calling_path' => $_GET['q'])));
 }
