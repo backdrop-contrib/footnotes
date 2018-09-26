@@ -45,7 +45,6 @@ CKEDITOR.plugins.add('footnotes', {
     });
     // Add buttons for footnotes.
     if (editor.ui.addButton) {
-      console.log(this.path + 'images/footnotes.png');
       editor.ui.addButton('footnotes', {
         label: Backdrop.t('Insert footnote'),
         command: 'footnotes',
