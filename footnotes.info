@@ -1,5 +1,6 @@
 name = Footnotes
 description = "Add automatically numbered footnotes to your posts."
 backdrop = 1.x
+package = Footnotes
 type = module
-stylesheets[all][] = footnotes.css
+stylesheets[all][] = css/footnotes.css
