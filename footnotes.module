@@ -46,11 +46,11 @@ function _footnotes_filter_tips($filter, $format, $long = FALSE) {
  * This has currently 1 setting, the feature to collapse together footnotes
  * with identical content is an option.
  */
-function _footnotes_settings($form, &$form_state, $filter, $format, $defaults, $filters) {
+function _footnotes_settings($form, &$form_state, $filter, $format) {
   $settings['footnotes_collapse'] = array(
     '#type' => 'checkbox',
     '#title' => t('Collapse footnotes with identical content'),
-    '#default_value' => isset($filter->settings['footnotes_collapse']) ? $filter->settings['footnotes_collapse'] : $defaults['footnotes_collapse'],
+    '#default_value' => $filter->settings['footnotes_collapse'],
     '#description' => t('If two footnotes have the exact same content, they will be collapsed into one as if using the same value="" attribute.'),
   );
   return $settings;
