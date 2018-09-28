@@ -7,7 +7,7 @@
 
 class footnotes_views_handler_field_body_footnotes extends views_handler_field_entity {
 
-  function init(&$view, $options) {
+  public function init(&$view, $options) {
     parent::init($view, $options);
   }
 
