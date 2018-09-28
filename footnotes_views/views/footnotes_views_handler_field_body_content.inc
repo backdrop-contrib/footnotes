@@ -10,7 +10,7 @@ class footnotes_views_handler_field_body_content extends views_handler_field_ent
   /**
    * Function init().
    */
-  function init(&$view, $options) {
+  public function init(&$view, $options) {
     parent::init($view, $options);
   }
 
