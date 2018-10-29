@@ -10,7 +10,7 @@ Status
 ------
 
 This is an initial port of the module. While the basics are working fine,
-CKEditor and Views integration need some work.
+CKEditor and Views integration could need some improvements.
 
 Requirements
 ------------
@@ -31,7 +31,7 @@ The main module doesn't provide a configuration page.
 To use Footnotes, you have to configure a text format:
 
 - Go to **Administration > Configuration > Content authoring**.
-- Configure a *text format* of your choice.
+- Configure a text format of your choice.
 - Under *Enabled filters*, enable the "Footnotes" filter.
 - Under *Filter processing order*, "Footnotes" should stay above the HTML filters.
 
@@ -75,7 +75,7 @@ Examples:
 
 `[fn value="5"]This footnote is number 5. Next footnotes will be 6 and 7.[/fn]`
 
-`[fn value="*"]This footnote has the marker "*"[/fn]`
+`[fn value="*"]This footnote has the marker "*".[/fn]`
 
 **Footnotes block**
 
@@ -102,7 +102,7 @@ the View.
 The *Footnotes Wysiwyg* submodule adds an *Insert footnote* button to CKEditor.
 The button allows to insert Footnotes using a modal dialog.
 
-To use *Footnotes Wysiwyg*, enable the submodule, configure a *text format* with
+To use *Footnotes Wysiwyg*, enable the submodule, configure a text format with
 *Footnotes* support, and drag the *Footnotes* button in the *Active toolbar*.
 Then, edit a content item, go to the text editor, put the cursor in the text,
 choose the *Footnotes* button, and insert the footnote text in the dialog. The
@@ -125,7 +125,7 @@ Credits
 -------
 
 - Ported to Backdrop CMS by Olaf Grabienski (https://github.com/olafgrabienski).
-- Substantial help during the port by docwilmot (https://github.com/docwilmot), Herb https://github.com/herbdool, and Graham Oliver (https://github.com/Graham-72).
+- Substantial help during the port by docwilmot (https://github.com/docwilmot), Herb v/d Dool (https://github.com/herbdool), and Graham Oliver (https://github.com/Graham-72).
 - Originally written for Drupal by Henrik Ingo (https://www.drupal.org/u/hingo).
 
 License
