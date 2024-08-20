@@ -60,7 +60,7 @@ function _footnotes_settings($form, &$form_state, $filter, $format) {
 /**
  * The bulk of filtering work is done here.
  */
-function _footnotes_filter($text = '', $filter, $format) {
+function _footnotes_filter($text, $filter, $format) {
 
   // Supporting both [fn] and <fn> now.
   // Thanks to fletchgqc http://drupal.org/node/268026.
